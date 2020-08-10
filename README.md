@@ -1,1 +1,1 @@
-# fresh-picks
+# Fresh Picks
