@@ -1,0 +1,135 @@
+{% extends 'base_template.html' %}
+{% block content %}
+
+    <section class="ftco-section">
+        {% block main %}
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xl-7 ftco-animate">
+                        <form action="/sign-up" method="post" class="billing-form">
+                            <h3 class="mb-4 billing-heading">Sign Up!</h3>
+                            <div class="row align-items-end">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="full-name">Full Name</label>
+                                        <input type="text" class="form-control" name="full-name"
+                                               placeholder="John Bhara" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="home-address">Home Address</label>
+                                        <input type="text" class="form-control" name="home-address"
+                                               placeholder="House number and street name" required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="town-city">Town / City</label>
+                                        <input type="text" class="form-control" name="town-city" placeholder="Lusaka"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="state-country">State / Country</label>
+                                        <div class="select-wrap">
+                                            <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                            <select name="state-country" class="form-control">
+                                                <option value="zambia">Zambia</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+
+                                <div class="w-100"></div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone-number">Phone Number</label>
+                                        <input type="number" class="form-control" name="phone-number" placeholder="+260"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email-address">Email Address</label>
+                                        <input type="text" class="form-control" name="email-address"
+                                               placeholder="(Optional)">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="gender">Gender (Sex)</label>
+                                        <div class="select-wrap">
+                                            <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                            <select name="gender" class="form-control">
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="dob">Date of Birth</label>
+                                        <input type="date" class="form-control" name="dob" data-date-format="DD/MM/YYYY"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="password">Enter Password</label>
+                                        <input type="password" class="form-control" name="password"
+                                               placeholder="Password"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="confirm-password">Confirm Password</label>
+                                        <input type="password" class="form-control" name="confirm-password"
+                                               placeholder="Password" required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+
+                                {% if feedback %}
+                                    <p class="alert-danger float-xl-none">{{ feedback }}</p>
+                                {% endif %}
+
+                                <div class="w-100"></div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="accepted" class="mr-2" required>
+                                                I have read and accept the terms and conditions
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <input type="submit" class="col-md-12 btn btn-primary py-3 px-4"/>
+                            </div>
+
+                        </form><!-- END -->
+                    </div>
+                </div>
+            </div>
+
+        {% endblock %}
+    </section> <!-- .section -->
+
+{% endblock %}
