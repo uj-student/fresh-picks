@@ -80,7 +80,7 @@
                                     <p style="color: #000;">600 kg available</p>
                                 </div>
                             </div>
-                            <p><a href="cart.html" class="btn btn-black py-3 px-5">Add to Cart</a></p>
+                            <p><a href="cart.html" class="btn btn-primary py-3 px-5">Add to Cart</a></p>
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                                 <h3><a href="#">{{ item.get_product_name() }}</a></h3>
                                 <div class="d-flex">
                                     <div class="pricing">
-                                        {#                                                        <p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>#}
+                                        {#<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>#}
                                         <p class="price"><span
                                                 class="price-sale">ZK{{ "%.2f"|format(item.get_product_price()) }}</span>
                                         </p>
@@ -121,16 +121,16 @@
                                 </div>
                                 <div class="bottom-area d-flex px-3">
                                     <div class="m-auto d-flex">
-                                        {#	    							                    <a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">#}
-                                        {#	    								                    <span><i class="ion-ios-menu"></i></span>#}
-                                        {#	    							                    </a>#}
+                                        {#<a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">#}
+                                        {# <span><i class="ion-ios-menu"></i></span>#}
+                                        {#</a>#}
                                         <a href="#"
                                            class="buy-now d-flex justify-content-center align-items-center mx-1">
                                             <span><i class="ion-ios-cart"></i></span>
                                         </a>
-                                        {#	    							                    <a href="#" class="heart d-flex justify-content-center align-items-center ">#}
-                                        {#	    								                    <span><i class="ion-ios-heart"></i></span>#}
-                                        {#                                                        </a>#}
+                                        {#<a href="#" class="heart d-flex justify-content-center align-items-center ">#}
+                                        {# <span><i class="ion-ios-heart"></i></span>#}
+                                        {#</a>#}
                                     </div>
                                 </div>
                             </div>
@@ -139,7 +139,7 @@
                 {% endfor %}
 
                 <div>
-                    <input type="submit" class="col-md-12 btn btn-primary py-3 px-4" value="Checkout">
+                    <input type="submit" class="col-md-12 btn btn-primary py-3 px-4" value="Proceed to Checkout">
                 </div>
             </div>
         </div>
