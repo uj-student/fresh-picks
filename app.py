@@ -1,7 +1,6 @@
-import functools
 import traceback
 
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, g, render_template, request, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import Utils
@@ -9,10 +8,9 @@ import Utils as util
 import databaseManager as db
 from FreshPicksObjects import User
 
-# from flask_login import login_user
-
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.debug = True
 
 
 @app.route('/')
@@ -48,6 +46,14 @@ def products():
     return render_template('products.html', baskets=basket_list, extras=extra_list)
 
 
+@app.before_request
+def before_request():
+    g.user = None
+
+    if 'user_name' in session:
+        g.user = session['user_name']
+
+
 @app.route('/login', methods=['GET', "POST"])
 def login():
     error = ""
@@ -65,13 +71,16 @@ def login():
         if not error:
             session.clear()
             session['user_id'] = user_profile.get_user_id()
-            return redirect(url_for('product'))
+            session['user_name'] = user_profile.get_user_first_name()
+            return redirect(url_for('products'))
 
     return render_template('login.html', feedback=error)
 
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
+    if g.user:
+        return redirect(url_for('home'))
     if request.method == 'POST':
         req = request.form
 
@@ -108,26 +117,30 @@ def signup():
 def checkout():
     return render_template('checkout.html')
 
+
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home'))
 
-def login_required(view):
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.user is None:
-            return redirect(url_for('login'))
 
-        return view(**kwargs)
+@app.route('/profile')
+def profile():
+    if not g.user:
+        return redirect(url_for('login'))
+    return render_template('profile.html')
 
-    return wrapped_view
+
+@app.route('/add', methods=['POST'])
+def add_product_to_cart():
+   pass
 
 
 @app.route('/wish')
 def wish():
     session.clear()
     return render_template('wishlist.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

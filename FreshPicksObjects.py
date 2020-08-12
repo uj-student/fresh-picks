@@ -41,6 +41,9 @@ class User:
     def get_user_name(self):
         return self.name
 
+    def get_user_first_name(self):
+        return self.name.split(' ')[0]
+
     def get_user_address(self):
         return self.address
 

@@ -33,7 +33,7 @@ def get_products():
         if record:
             return record
 
-
+# need a date created and date modified timestamp
 def add_user(user_account):
     conn = get_connection()
     try:
@@ -64,6 +64,25 @@ def get_user_profile(user_phone):
         query = "select * from users where phone_number = ?;"
         cursor = conn.cursor()
         user_account = cursor.execute(query, (user_phone, )).fetchone()
+        cursor.close()
+
+    except Exception as error:
+        traceback.print_exc()
+        print()
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+    return user_account
+
+
+def get_user_by_id(user_id):
+    conn = get_connection()
+    user_account = ""
+    try:
+        query = "select * from users where id = ?;"
+        cursor = conn.cursor()
+        user_account = cursor.execute(query, (user_id,)).fetchone()
         cursor.close()
 
     except Exception as error:
