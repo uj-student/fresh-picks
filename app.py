@@ -1,6 +1,6 @@
 import traceback
 
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, g, render_template, request, redirect, session, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import Utils
@@ -10,61 +10,59 @@ from FreshPicksObjects import User
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-
-
-HOME = 'index.html'
-CONTACT = 'contact.html'
-ABOUT = 'about.html'
-SHOP = 'shop.html'
-CART = 'cart.html'
-PRODUCTS = 'products.html'
-LOGIN = 'login.html'
-SIGNUP = 'sign-up.html'
+app.debug = True
 
 
 @app.route('/')
-@app.route(f'/{HOME}')
+@app.route('/home')
 def home():
-    return render_template(HOME)
+    return render_template('index.html')
 
 
-@app.route(f'/{CONTACT}')
+@app.route('/contact')
 def contact():
-    return render_template(CONTACT)
+    return render_template('contact.html')
 
 
-@app.route(f'/{ABOUT}')
+@app.route('/about')
 def about():
-    return render_template(ABOUT)
+    return render_template('about.html')
 
 
-@app.route(f'/{SHOP}')
+@app.route('/shop')
 def shop():
-    return render_template(SHOP)
+    return render_template('shop.html')
 
 
-@app.route(f'/{CART}')
+@app.route('/cart')
 def cart():
-    return render_template(CART)
+    return render_template('cart.html')
 
 
-@app.route(f'/{PRODUCTS}')
-def product():
+@app.route('/products')
+def products():
     product_list = db.get_products()
     basket_list, extra_list = util.convert_to_Product(product_list)
-    return render_template(PRODUCTS, baskets=basket_list, extras=extra_list)
+    return render_template('products.html', baskets=basket_list, extras=extra_list)
 
 
-@app.route(f'/login', methods=['GET', "POST"])
+@app.before_request
+def before_request():
+    g.user = None
+
+    if 'user_name' in session:
+        g.user = session['user_name']
+
+
+@app.route('/login', methods=['GET', "POST"])
 def login():
     error = ""
     if request.method == 'POST':
         req = request.form
 
-
         user_profile = db.get_user_profile(req['phone-number'])
         if user_profile is None:
-            error ="Account could not be found. Have you registered?"
+            error = "Account could not be found. Have you registered?"
         else:
             user_profile = Utils.convert_to_User(user_profile)
             if not check_password_hash(user_profile.get_user_password(), req['enter-password']):
@@ -73,19 +71,22 @@ def login():
         if not error:
             session.clear()
             session['user_id'] = user_profile.get_user_id()
-            return redirect(url_for('product'))
+            session['user_name'] = user_profile.get_user_first_name()
+            return redirect(url_for('products'))
 
-    return render_template({LOGIN}, feedback = error)
+    return render_template('login.html', feedback=error)
 
 
-@app.route(f'/sign-up', methods=['GET', 'POST'])
+@app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
+    if g.user:
+        return redirect(url_for('home'))
     if request.method == 'POST':
         req = request.form
 
         if req['password'] != req['confirm-password']:
             feedback = f"Password must be the same. Please try again."
-            return render_template(SIGNUP, feedback=feedback)
+            return render_template('sign-up.html', feedback=feedback)
         user_account = User(
             req['full-name'],
             req['home-address'],
@@ -104,16 +105,42 @@ def signup():
         except Exception as error:
             feedback = f"Could not create account. \nReason: {error}"
             traceback.print_exc()
-            return render_template(SIGNUP, feedback=feedback)
+            return render_template('sign-up.html', feedback=feedback)
 
         feedback = f"Hi {user_account.get_user_name()}, thanks for signing up. Please login in to start shopping. Enjoy!"
 
-        return render_template(LOGIN, feedback=feedback)
-    return render_template(SIGNUP)
+        return render_template('login.html', feedback=feedback)
+    return render_template('sign-up.html')
+
 
 @app.route('/checkout')
 def checkout():
     return render_template('checkout.html')
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
+
+
+@app.route('/profile')
+def profile():
+    if not g.user:
+        return redirect(url_for('login'))
+    return render_template('profile.html')
+
+
+@app.route('/add', methods=['POST'])
+def add_product_to_cart():
+   pass
+
+
+@app.route('/wish')
+def wish():
+    session.clear()
+    return render_template('wishlist.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
