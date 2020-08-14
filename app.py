@@ -131,10 +131,12 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/account')
+@app.route('/account', methods=['GET', 'POST'])
 def profile():
     if not g.user:
         return redirect(url_for('login'))
+    if request.method == "POST":
+        pass
     return render_template('account.html')
 
 
