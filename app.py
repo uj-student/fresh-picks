@@ -71,7 +71,14 @@ def login():
         if not error:
             session.clear()
             session['user_id'] = user_profile.get_user_id()
-            session['user_name'] = user_profile.get_user_first_name()
+            session['user_first_name'] = user_profile.get_user_first_name()
+            session['user_name'] = user_profile.get_user_name()
+            session['user_address'] = user_profile.get_user_address()
+            session['user_town'] = user_profile.get_user_town()
+            session['user_phone'] = user_profile.get_user_phone_number()
+            session['user_email'] = user_profile.get_user_email_address()
+            session['user_gender'] = user_profile.get_user_gender()
+            session['user_dob'] = user_profile.get_user_birthday()
             return redirect(url_for('products'))
 
     return render_template('login.html', feedback=error)
@@ -124,11 +131,11 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/profile')
+@app.route('/account')
 def profile():
     if not g.user:
         return redirect(url_for('login'))
-    return render_template('profile.html')
+    return render_template('account.html')
 
 
 @app.route('/add', methods=['POST'])
