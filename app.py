@@ -1,12 +1,12 @@
 import traceback
 
-from flask import Flask, g, render_template, request, redirect, session, url_for
+from flask import Flask, g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import Utils
 import Utils as util
 import databaseManager as db
-from FreshPicksObjects import User
+from FreshPicksObjects import User, UserUpdatedDetails
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -69,20 +69,22 @@ def login():
                 error = "Incorrect Password"
 
         if not error:
-            session.clear()
-            session['user_id'] = user_profile.get_user_id()
-            session['user_first_name'] = user_profile.get_user_first_name()
-            session['user_name'] = user_profile.get_user_name()
-            session['user_address'] = user_profile.get_user_address()
-            session['user_town'] = user_profile.get_user_town()
-            session['user_phone'] = user_profile.get_user_phone_number()
-            session['user_email'] = user_profile.get_user_email_address()
-            session['user_gender'] = user_profile.get_user_gender()
-            session['user_dob'] = user_profile.get_user_birthday()
+            setupSession(user_profile)
             return redirect(url_for('products'))
 
     return render_template('login.html', feedback=error)
 
+def setupSession(user_profile):
+    session.clear()
+    session['user_id'] = user_profile.get_user_id()
+    session['user_first_name'] = user_profile.get_user_first_name()
+    session['user_name'] = user_profile.get_user_name()
+    session['user_address'] = user_profile.get_user_address()
+    session['user_town'] = user_profile.get_user_town()
+    session['user_phone'] = user_profile.get_user_phone_number()
+    session['user_email'] = user_profile.get_user_email_address()
+    session['user_gender'] = user_profile.get_user_gender()
+    session['user_dob'] = user_profile.get_user_birthday()
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
@@ -132,17 +134,46 @@ def logout():
 
 
 @app.route('/account', methods=['GET', 'POST'])
-def profile():
+def account():
     if not g.user:
         return redirect(url_for('login'))
     if request.method == "POST":
-        pass
+        req = request.form
+        phone = req['phone-number']
+        email = req['email-address']
+
+        current_user = UserUpdatedDetails(session['user_id'], session['user_name'], session['user_address'],
+                                          session['user_town'], session['user_phone'], session['user_email'],
+                                          session['user_gender'], session['user_dob'])
+
+        new_user = UserUpdatedDetails("#", req['full-name'], req['home-address'], req['town-city'],
+                                      req['phone-number'], req['email-address'], req['gender'], req['dob'])
+
+        is_unique = db.is_unique(phone, email)
+        if session['user_phone'] == phone and session['user_email'] == email and (
+                req['full-name'] != session['user_name']
+                or req['home-address'] != session['user_address']
+                or req['town-city'] != session['user_town']
+                or req['gender'] != session['user_gender']
+                or req['dob'] != session['user_dob']):
+            db.update_user(old_data=current_user, new_data=new_user)
+            flash("Details updated successfully")
+            user_profile = db.get_user_by_id(session['user_id'])
+            user_profile = Utils.convert_to_User(user_profile)
+            setupSession(user_profile)
+            return redirect(url_for('account'))
+        else:
+            if is_unique:
+                flash("Phone Number or email already in use.", "alert-info")
+                return redirect(url_for('account'))
+            elif phone != session['user_phone'] or email != session['user_email']:
+                db.update_user(old_data=current_user, new_data=new_user)
     return render_template('account.html')
 
 
 @app.route('/add', methods=['POST'])
 def add_product_to_cart():
-   pass
+    pass
 
 
 @app.route('/wish')

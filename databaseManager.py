@@ -33,6 +33,7 @@ def get_products():
         if record:
             return record
 
+
 # need a date created and date modified timestamp
 def add_user(user_account):
     conn = get_connection()
@@ -57,13 +58,14 @@ def add_user(user_account):
     finally:
         close_connection(conn)
 
+
 def get_user_profile(user_phone):
     conn = get_connection()
     user_account = ""
     try:
         query = "select * from users where phone_number = ?;"
         cursor = conn.cursor()
-        user_account = cursor.execute(query, (user_phone, )).fetchone()
+        user_account = cursor.execute(query, (user_phone,)).fetchone()
         cursor.close()
 
     except Exception as error:
@@ -93,3 +95,54 @@ def get_user_by_id(user_id):
         close_connection(conn)
 
     return user_account
+
+
+def is_unique(phone_number, email):
+    conn = get_connection()
+    unique = True
+    try:
+        query = "select * from users where phone_number = ? or email_address = ?;"
+        cursor = conn.cursor()
+        result = cursor.execute(query, (phone_number, email)).fetchall()
+        cursor.close()
+    except Exception:
+        raise Exception
+    finally:
+        close_connection(conn)
+
+    if len(result) > 0:
+        unique = False
+    return unique
+
+
+# assumption is user won't be changing a lot of fields
+def update_user(old_data, new_data):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        if old_data.get_name() != new_data.get_name():
+            query = "UPDATE users SET fullname = ? where id =? ;"
+            cursor.execute(query, (new_data.get_name(), old_data.get_id()))
+        if old_data.get_address() != new_data.get_address():
+            query = "UPDATE users SET address = ? where id =? ;"
+            cursor.execute(query, (new_data.get_address(), old_data.get_id()))
+        if old_data.get_town() != new_data.get_town():
+            query = "UPDATE users SET town = ? where id =? ;"
+            cursor.execute(query, (new_data.get_town(), old_data.get_id()))
+        if old_data.get_phone() != new_data.get_phone():
+            query = "UPDATE users SET phone_number = ? where id =? ;"
+            cursor.execute(query, (new_data.get_phone(), old_data.get_id()))
+        if old_data.get_email() != new_data.get_email():
+            query = "UPDATE users SET email_address = ? where id =? ;"
+            cursor.execute(query, (new_data.get_email(), old_data.get_id()))
+        if old_data.get_gender() != new_data.get_gender():
+            query = "UPDATE users SET gender = ? where id =? ;"
+            cursor.execute(query, (new_data.get_gender(), old_data.get_id()))
+        if old_data.get_dob() != new_data.get_dob():
+            query = "UPDATE users SET dob = ? where id =? ;"
+            cursor.execute(query, (new_data.get_dob(), old_data.get_id()))
+        conn.commit()
+    except Exception:
+        raise Exception
+    finally:
+        close_connection(conn)

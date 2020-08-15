@@ -104,3 +104,38 @@ class User:
 
     def set_user_id(self, db_id):
         self.id = db_id
+
+class UserUpdatedDetails:
+    def __init__(self, _id, fullname, address, town, phone, email, gender, dob):
+        self._id = _id
+        self.name = fullname
+        self.address = address
+        self.town = town
+        self.phone = phone
+        self.email = email
+        self.gender = gender
+        self.dob = dob
+
+    def get_id(self):
+        return self._id
+
+    def get_name(self):
+        return self.name
+
+    def get_address(self):
+        return self.address
+
+    def get_town(self):
+        return self.town
+
+    def get_phone(self):
+        return self.phone
+
+    def get_email(self):
+        return self.email
+
+    def get_gender(self):
+        return self.gender
+
+    def get_dob(self):
+        return self.dob

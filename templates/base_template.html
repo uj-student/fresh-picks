@@ -85,7 +85,7 @@
                            aria-haspopup="true" aria-expanded="false">{{ session['user_first_name'] }}</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown04">
                         <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
-{#                        <a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a>#}
+                        <a class="dropdown-item" href="{{ url_for('account') }}">My Profile</a>
                     </div>
                     </li>
                     <li class="nav-item cta cta-colored"><a href="{{ url_for('cart') }}" class="nav-link"><span
