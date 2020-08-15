@@ -12,7 +12,6 @@ def convert_to_Product(database_result):
 
 def convert_to_User(database_record):
     return my_objects.User(
-
         database_record[1],
         database_record[2],
         database_record[3],
@@ -24,5 +23,4 @@ def convert_to_User(database_record):
         database_record[10],
         database_record[6], # email column
         database_record[0] # db id
-
     )
