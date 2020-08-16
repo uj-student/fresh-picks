@@ -14,18 +14,20 @@
         </div>
     </div>
 
-
     {% for item in baskets %}
         {% if item.is_main %}
             <section class="ftco-section">
                 <div class="container">
-                    <div class="row">
+
+                    <form action="/add" method="post" class="row">
                         <div class="col-lg-6 mb-5 ftco-animate">
                             <a href="../static/images/product-1.jpg" class="image-popup"><img
                                     src="{{ item.get_product_image() }}" class="img-fluid" alt="Colorlib Template"></a>
                         </div>
                         <div class="col-lg-6 product-details pl-md-5 ftco-animate">
-                            <h3>{{ item.get_product_name() }}</h3>
+                            <div>
+                                <h3 name="product-name">{{ item.get_product_name() }}</h3>
+                            </div>
                             <div class="rating d-flex">
                                 <p class="text-left mr-4">
                                     <a href="#" class="mr-2">5.0</a>
@@ -44,7 +46,8 @@
                                             style="color: #bbb;">Sold</span></a>
                                 </p>
                             </div>
-                            <p class="price"><span>ZK {{ "%.2f"|format(item.get_product_price()) }}</span></p>
+                            <p class="price"><span
+                                    name="product-price">ZK {{ "%.2f"|format(item.get_product_price()) }}</span></p>
                             <p>{{ item.get_product_description() }} </p>
                             <div class="row mt-4">
                                 <div class="col-md-6">
@@ -79,15 +82,25 @@
                                 <div class="col-md-12">
                                     <p style="color: #000;">600 kg available</p>
                                 </div>
+                                <div>
+                                    <p>
+                                        <button type="submit" class="button py-3 px-5">Add to Cart</button>
+                                    </p>
+                                    {#                                    <a type="submit" class="btn btn-primary py-3 px-5">Add to Cart</a>#}
+                                </div>
+
                             </div>
-                            <p><a href="cart.html" class="btn btn-primary py-3 px-5">Add to Cart</a></p>
+                            {#                            <p>#}
+                            {#                                <a href="{{ url_for('add_product_to_cart') }}" class="btn btn-primary py-3 px-5">Add to#}
+                            {#                                Cart</a>#}
+                            {#                            </p>#}
                         </div>
-                    </div>
+                    </form>
+
                 </div>
             </section>
         {% endif %}
     {% endfor %}
-
 
     <section class="ftco-section">
         <div class="container">
@@ -103,7 +116,7 @@
             <div class="row">
                 {% for item in extras %}
                     <div class="col-md-6 col-lg-3 ftco-animate">
-                        <div class="product">
+                        <form class="product">
                             <a href="#" class="img-prod"><img class="img-fluid" src="{{ item.get_product_image() }}"
                                                               alt="Colorlib Template">
                                 {#    						            <span class="status">30%</span>#}
@@ -134,7 +147,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 {% endfor %}
 

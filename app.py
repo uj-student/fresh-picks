@@ -10,7 +10,6 @@ from FreshPicksObjects import User, UserUpdatedDetails
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
-app.debug = True
 
 
 @app.route('/')
@@ -69,12 +68,12 @@ def login():
                 error = "Incorrect Password"
 
         if not error:
-            setupSession(user_profile)
+            setupUserSession(user_profile)
             return redirect(url_for('products'))
 
     return render_template('login.html', feedback=error)
 
-def setupSession(user_profile):
+def setupUserSession(user_profile):
     session.clear()
     session['user_id'] = user_profile.get_user_id()
     session['user_first_name'] = user_profile.get_user_first_name()
@@ -160,7 +159,7 @@ def account():
             flash("Details updated successfully")
             user_profile = db.get_user_by_id(session['user_id'])
             user_profile = Utils.convert_to_User(user_profile)
-            setupSession(user_profile)
+            setupUserSession(user_profile)
             return redirect(url_for('account'))
         else:
             if is_unique:
@@ -173,7 +172,44 @@ def account():
 
 @app.route('/add', methods=['POST'])
 def add_product_to_cart():
-    pass
+
+    if request.method == 'POST':
+        total_price = 0
+        total_quantity = 0
+        req = request.form
+        name = req['product-name']
+        price = req["product-price"]
+        session.modified = True
+
+        quantity = 1
+        item_array = {
+            name : [price, quantity]
+        }
+
+        if 'my_cart' not in session:
+            session['my_cart'] = session['my_cart'] + item_array
+            total_price += item_array.get(name)[0]
+            total_quantity += item_array.get(name)[1]
+        else:
+            t_price = 0
+            t_quantity = 0
+            if name in session['my-cart']:
+                for k, v in session['my-cart'].items():
+                    if k == name:
+                        session['my-cart'][v][1] += 1 # quantity
+                        t_price += session['my-cart'][v][0]
+                        t_quantity += session['my-cart'][v][1]
+            else:
+                session['my-cart'] = array_merge(session['my-cart'], item_array)
+                total_price += t_price
+                total_quantity += t_quantity
+
+        session['total_price'] = total_price
+        session['total_quantity'] = total_quantity
+        print(f"Price: {[session['total_price']]}")
+        print(f"Quantity: {[session['total_quantity']]}")
+        print(f"Cart: {[session['my-cart']]}")
+        return redirect(url_for('products'))
 
 
 @app.route('/wish')
@@ -181,6 +217,14 @@ def wish():
     session.clear()
     return render_template('wishlist.html')
 
+def array_merge(first_array, second_array):
+    if isinstance(first_array, list) and isinstance(second_array, list):
+        return first_array + second_array
+    elif isinstance(first_array, dict) and isinstance(second_array, dict):
+        return dict(list(first_array.items()) + list(second_array.items()))
+    elif isinstance(first_array, set) and isinstance(second_array, set):
+        return first_array.union(second_array)
+    return False
 
 if __name__ == '__main__':
     app.run(debug=True)
