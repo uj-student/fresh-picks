@@ -14,18 +14,22 @@
         </div>
     </div>
 
-
     {% for item in baskets %}
         {% if item.is_main %}
             <section class="ftco-section">
                 <div class="container">
-                    <div class="row">
+
+                    <form action="/add" method="post" class="row">
                         <div class="col-lg-6 mb-5 ftco-animate">
                             <a href="../static/images/product-1.jpg" class="image-popup"><img
                                     src="{{ item.get_product_image() }}" class="img-fluid" alt="Colorlib Template"></a>
                         </div>
                         <div class="col-lg-6 product-details pl-md-5 ftco-animate">
-                            <h3>{{ item.get_product_name() }}</h3>
+                            <div class="product-name">
+                                <h3>{{ item.get_product_name() }}</h3>
+                                <input type="hidden" name="p-name" value="{{ item.get_product_name() }}"/>
+
+                            </div>
                             <div class="rating d-flex">
                                 <p class="text-left mr-4">
                                     <a href="#" class="mr-2">5.0</a>
@@ -44,7 +48,12 @@
                                             style="color: #bbb;">Sold</span></a>
                                 </p>
                             </div>
-                            <p class="price"><span>ZK {{ "%.2f"|format(item.get_product_price()) }}</span></p>
+                            <p class="price">
+                                <span name="product-price">ZK {{ "%.2f"|format(item.get_product_price()) }}</span>
+                                <input type="hidden" name="p-price"
+                                       value="{{ "%.2f"|format(item.get_product_price()) }}"/>
+
+                            </p>
                             <p>{{ item.get_product_description() }} </p>
                             <div class="row mt-4">
                                 <div class="col-md-6">
@@ -79,15 +88,17 @@
                                 <div class="col-md-12">
                                     <p style="color: #000;">600 kg available</p>
                                 </div>
+                                <div>
+                                    <input type="submit" value="Add to Cart" class="btn btn-primary py-3 px-5"/>
+                                </div>
                             </div>
-                            <p><a href="cart.html" class="btn btn-primary py-3 px-5">Add to Cart</a></p>
                         </div>
-                    </div>
+                    </form>
+
                 </div>
             </section>
         {% endif %}
     {% endfor %}
-
 
     <section class="ftco-section">
         <div class="container">
@@ -103,7 +114,7 @@
             <div class="row">
                 {% for item in extras %}
                     <div class="col-md-6 col-lg-3 ftco-animate">
-                        <div class="product">
+                        <form action="/add" method="post" class="product">
                             <a href="#" class="img-prod"><img class="img-fluid" src="{{ item.get_product_image() }}"
                                                               alt="Colorlib Template">
                                 {#    						            <span class="status">30%</span>#}
@@ -111,11 +122,14 @@
                             </a>
                             <div class="text py-3 pb-4 px-3 text-center">
                                 <h3><a href="#">{{ item.get_product_name() }}</a></h3>
+                                <input type="hidden" name="p-name" value="{{ item.get_product_name() }}"/>
                                 <div class="d-flex">
                                     <div class="pricing">
                                         {#<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>#}
                                         <p class="price"><span
                                                 class="price-sale">ZK{{ "%.2f"|format(item.get_product_price()) }}</span>
+                                            <input type="hidden" name="p-price"
+                                                   value="{{ "%.2f"|format(item.get_product_price()) }}"/>
                                         </p>
                                     </div>
                                 </div>
@@ -124,17 +138,16 @@
                                         {#<a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">#}
                                         {# <span><i class="ion-ios-menu"></i></span>#}
                                         {#</a>#}
-                                        <a href="#"
-                                           class="buy-now d-flex justify-content-center align-items-center mx-1">
-                                            <span><i class="ion-ios-cart"></i></span>
-                                        </a>
+
+                                        <button type="submit" class="btn-primary btn ion-ios-cart"></button>
+
                                         {#<a href="#" class="heart d-flex justify-content-center align-items-center ">#}
                                         {# <span><i class="ion-ios-heart"></i></span>#}
                                         {#</a>#}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 {% endfor %}
 
