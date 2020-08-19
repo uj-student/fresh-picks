@@ -25,8 +25,10 @@
                                     src="{{ item.get_product_image() }}" class="img-fluid" alt="Colorlib Template"></a>
                         </div>
                         <div class="col-lg-6 product-details pl-md-5 ftco-animate">
-                            <div>
-                                <h3 name="product-name">{{ item.get_product_name() }}</h3>
+                            <div class="product-name">
+                                <h3>{{ item.get_product_name() }}</h3>
+                                <input type="hidden" name="p-name" value="{{ item.get_product_name() }}"/>
+
                             </div>
                             <div class="rating d-flex">
                                 <p class="text-left mr-4">
@@ -46,8 +48,11 @@
                                             style="color: #bbb;">Sold</span></a>
                                 </p>
                             </div>
-                            <p class="price"><span
-                                    name="product-price">ZK {{ "%.2f"|format(item.get_product_price()) }}</span></p>
+                            <p class="price">
+                                <span name="product-price">ZK {{ "%.2f"|format(item.get_product_price()) }}</span>
+                                <input type="hidden" name="p-price" value="{{ "%.2f"|format(item.get_product_price()) }}"/>
+
+                            </p>
                             <p>{{ item.get_product_description() }} </p>
                             <div class="row mt-4">
                                 <div class="col-md-6">
@@ -83,17 +88,9 @@
                                     <p style="color: #000;">600 kg available</p>
                                 </div>
                                 <div>
-                                    <p>
-                                        <button type="submit" class="button py-3 px-5">Add to Cart</button>
-                                    </p>
-                                    {#                                    <a type="submit" class="btn btn-primary py-3 px-5">Add to Cart</a>#}
+                                    <input type="submit" value="Add to Cart" class="btn btn-primary py-3 px-5"/>
                                 </div>
-
                             </div>
-                            {#                            <p>#}
-                            {#                                <a href="{{ url_for('add_product_to_cart') }}" class="btn btn-primary py-3 px-5">Add to#}
-                            {#                                Cart</a>#}
-                            {#                            </p>#}
                         </div>
                     </form>
 

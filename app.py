@@ -40,6 +40,7 @@ def cart():
 
 @app.route('/products')
 def products():
+    # session.clear()
     product_list = db.get_products()
     basket_list, extra_list = util.convert_to_Product(product_list)
     return render_template('products.html', baskets=basket_list, extras=extra_list)
@@ -73,6 +74,7 @@ def login():
 
     return render_template('login.html', feedback=error)
 
+
 def setupUserSession(user_profile):
     session.clear()
     session['user_id'] = user_profile.get_user_id()
@@ -84,6 +86,7 @@ def setupUserSession(user_profile):
     session['user_email'] = user_profile.get_user_email_address()
     session['user_gender'] = user_profile.get_user_gender()
     session['user_dob'] = user_profile.get_user_birthday()
+
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
@@ -172,50 +175,47 @@ def account():
 
 @app.route('/add', methods=['POST'])
 def add_product_to_cart():
-
     if request.method == 'POST':
-        total_price = 0
         total_quantity = 0
         req = request.form
-        name = req['product-name']
-        price = req["product-price"]
+        name = req['p-name']
+        price = req['p-price']
         session.modified = True
 
         quantity = 1
         item_array = {
-            name : [price, quantity]
+            name: [float(price), int(quantity)]
         }
 
         if 'my_cart' not in session:
-            session['my_cart'] = session['my_cart'] + item_array
-            total_price += item_array.get(name)[0]
-            total_quantity += item_array.get(name)[1]
+            session['my_cart'] = item_array
+            session['total_quantity'] = 0
         else:
-            t_price = 0
             t_quantity = 0
-            if name in session['my-cart']:
-                for k, v in session['my-cart'].items():
+            if name in session['my_cart']:
+                for k, v in session['my_cart'].items():
                     if k == name:
-                        session['my-cart'][v][1] += 1 # quantity
-                        t_price += session['my-cart'][v][0]
-                        t_quantity += session['my-cart'][v][1]
+                        t_quantity = v[1] + 1
+                item_array = {
+                    name: [float(price), int(t_quantity)]
+                }
+                session['my_cart'] = array_merge(session['my_cart'], item_array)
             else:
-                session['my-cart'] = array_merge(session['my-cart'], item_array)
-                total_price += t_price
+                session['my_cart'] = array_merge(session['my_cart'], item_array)
                 total_quantity += t_quantity
 
-        session['total_price'] = total_price
+        for k, v in session['my_cart'].items():
+            total_quantity += v[1]
+
         session['total_quantity'] = total_quantity
-        print(f"Price: {[session['total_price']]}")
-        print(f"Quantity: {[session['total_quantity']]}")
-        print(f"Cart: {[session['my-cart']]}")
-        return redirect(url_for('products'))
+    return redirect(url_for('products'))
 
 
 @app.route('/wish')
 def wish():
     session.clear()
     return render_template('wishlist.html')
+
 
 def array_merge(first_array, second_array):
     if isinstance(first_array, list) and isinstance(second_array, list):
@@ -225,6 +225,7 @@ def array_merge(first_array, second_array):
     elif isinstance(first_array, set) and isinstance(second_array, set):
         return first_array.union(second_array)
     return False
+
 
 if __name__ == '__main__':
     app.run(debug=True)

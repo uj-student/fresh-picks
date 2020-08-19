@@ -89,7 +89,7 @@
                     </div>
                     </li>
                     <li class="nav-item cta cta-colored"><a href="{{ url_for('cart') }}" class="nav-link"><span
-                            class="icon-shopping_cart"></span>[0]</a></li>
+                            class="icon-shopping_cart"></span>{{ session['total_quantity'] }}</a></li>
 
                 {% else: %}
                     <li class="nav-item"><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
