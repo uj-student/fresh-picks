@@ -50,7 +50,8 @@
                             </div>
                             <p class="price">
                                 <span name="product-price">ZK {{ "%.2f"|format(item.get_product_price()) }}</span>
-                                <input type="hidden" name="p-price" value="{{ "%.2f"|format(item.get_product_price()) }}"/>
+                                <input type="hidden" name="p-price"
+                                       value="{{ "%.2f"|format(item.get_product_price()) }}"/>
 
                             </p>
                             <p>{{ item.get_product_description() }} </p>
@@ -113,7 +114,7 @@
             <div class="row">
                 {% for item in extras %}
                     <div class="col-md-6 col-lg-3 ftco-animate">
-                        <form class="product">
+                        <form action="/add" method="post" class="product">
                             <a href="#" class="img-prod"><img class="img-fluid" src="{{ item.get_product_image() }}"
                                                               alt="Colorlib Template">
                                 {#    						            <span class="status">30%</span>#}
@@ -121,11 +122,14 @@
                             </a>
                             <div class="text py-3 pb-4 px-3 text-center">
                                 <h3><a href="#">{{ item.get_product_name() }}</a></h3>
+                                <input type="hidden" name="p-name" value="{{ item.get_product_name() }}"/>
                                 <div class="d-flex">
                                     <div class="pricing">
                                         {#<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>#}
                                         <p class="price"><span
                                                 class="price-sale">ZK{{ "%.2f"|format(item.get_product_price()) }}</span>
+                                            <input type="hidden" name="p-price"
+                                                   value="{{ "%.2f"|format(item.get_product_price()) }}"/>
                                         </p>
                                     </div>
                                 </div>
@@ -134,10 +138,9 @@
                                         {#<a href="#" class="add-to-cart d-flex justify-content-center align-items-center text-center">#}
                                         {# <span><i class="ion-ios-menu"></i></span>#}
                                         {#</a>#}
-                                        <a href="#"
-                                           class="buy-now d-flex justify-content-center align-items-center mx-1">
-                                            <span><i class="ion-ios-cart"></i></span>
-                                        </a>
+
+                                        <button type="submit" class="btn-primary btn ion-ios-cart"></button>
+
                                         {#<a href="#" class="heart d-flex justify-content-center align-items-center ">#}
                                         {# <span><i class="ion-ios-heart"></i></span>#}
                                         {#</a>#}
