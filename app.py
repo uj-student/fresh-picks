@@ -213,7 +213,6 @@ def add_product_to_cart():
 
 @app.route('/wish')
 def wish():
-    session.clear()
     return render_template('wishlist.html')
 
 
