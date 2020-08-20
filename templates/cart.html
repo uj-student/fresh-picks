@@ -19,35 +19,43 @@
                                 <th>Total</th>
                             </tr>
                             </thead>
-                            {% for k, v in session.get('my_cart').items() %}
-                                <tbody>
-                                <tr class="text-center">
-                                    <td class="product-remove"><a href="#"><span class="ion-ios-close"></span></a></td>
+                            {% if 'my_cart' in session %}
+                                {% for k, v in session.get('my_cart').items() %}
+                                    <tbody>
+                                    <tr class="text-center">
+                                        <td class="product-remove">
+                                            <a href="{{ url_for('remove_product', name=k) }}">
+                                                <span class="ion-ios-close"></span>
+                                            </a>
+                                        </td>
 
-                                    <td class="image-prod">
-                                        <div class="img"
-                                             style="background-image:url({{ v[2] }});"></div>
-                                    </td>
+                                        <td class="image-prod">
+                                            <div class="img"
+                                                 style="background-image:url({{ v[2] }});"></div>
+                                        </td>
 
-                                    <td class="product-name">
-                                        <h3>{{ k }}</h3>
-                                        {#<p>Far far away, behind the word mountains, far from the countries</p>#}
-                                    </td>
+                                        <td class="product-name">
+                                            <h3>{{ k }}</h3>
+                                            {#<p>Far far away, behind the word mountains, far from the countries</p>#}
+                                        </td>
 
-                                    <td class="price">ZK{{ "%.2f"|format(v[0]) }}</td>
+                                        <td class="price">ZK{{ "%.2f"|format(v[0]) }}</td>
 
-                                    <td class="quantity">
-                                        <div class="input-group mb-3">
-                                            <input type="text" name="quantity"
-                                                   class="quantity form-control input-number"
-                                                   value={{ v[1] }} readonly>
-                                        </div>
-                                    </td>
+                                        <td class="quantity">
+                                            <div class="input-group mb-3">
+                                                <input type="text" name="quantity"
+                                                       class="quantity form-control input-number"
+                                                       value={{ v[1] }} readonly>
+                                            </div>
+                                        </td>
 
-                                    <td class="total">ZK{{ "%.2f"|format(v[0] * v[1]) }}</td>
-                                </tr><!-- END TR-->
-                                </tbody>
-                            {% endfor %}
+                                        <td class="total">ZK{{ "%.2f"|format(v[0] * v[1]) }}</td>
+                                    </tr><!-- END TR-->
+                                    </tbody>
+                                {% endfor %}
+                            {% else: %}
+                                <h3>Empty Cart</h3>
+                            {% endif %}
                         </table>
                     </div>
                 </div>
@@ -95,7 +103,7 @@
                             <h3>Cart Totals</h3>
                             <p class="d-flex">
                                 <span>Subtotal</span>
-                                <span>ZK{{ "%.2f"|format(session.get('total_price')) }}</span>
+                                <span>ZK{{ "%.2f"|format(session.get('total_price')) if 'cart' in session else 0 }}</span>
                             </p>
                             <p class="d-flex">
                                 <span>Delivery</span>
@@ -108,7 +116,7 @@
                             <hr>
                             <p class="d-flex total-price">
                                 <span>Total</span>
-                                <span>ZK{{ "%.2f"|format(session.get('total_price')) }}</span>
+                                <span>ZK{{ "%.2f"|format(session.get('total_price')) if 'cart' in session else 0}}</span>
                             </p>
                         </div>
                         <p><a href="checkout.html" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>

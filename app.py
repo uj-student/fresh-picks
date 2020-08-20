@@ -214,6 +214,29 @@ def add_product_to_cart():
         session['total_price'] = total_price
     return redirect(url_for('products'))
 
+@app.route('/remove/<string:name>')
+def remove_product(name):
+    total_price = 0
+    total_quantity = 0
+
+    for item in session.get('my_cart').items():
+        if item[0] == name:
+            session['my_cart'].pop(item[0], None)
+            if 'my_cart' in session:
+                for k, v in session['my_cart'].items():
+                    quantity = int(v[1])
+                    price = float(v[0])
+                    total_quantity += quantity
+                    total_price += price
+            break
+
+    if total_quantity < 1:
+        session.clear()
+    else:
+        session['total_quantity'] = total_quantity
+        session['total_price'] = total_price
+
+    return redirect(url_for('cart'))
 
 @app.route('/wish')
 def wish():
