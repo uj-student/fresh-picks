@@ -177,14 +177,16 @@ def account():
 def add_product_to_cart():
     if request.method == 'POST':
         total_quantity = 0
+        total_price = 0
         req = request.form
         name = req['p-name']
         price = req['p-price']
+        image = req['p-image']
         session.modified = True
 
         quantity = 1
         item_array = {
-            name: [float(price), int(quantity)]
+            name: [float(price), int(quantity), image]
         }
 
         if 'my_cart' not in session:
@@ -206,8 +208,10 @@ def add_product_to_cart():
 
         for k, v in session['my_cart'].items():
             total_quantity += v[1]
+            total_price += (v[0] * v[1])
 
         session['total_quantity'] = total_quantity
+        session['total_price'] = total_price
     return redirect(url_for('products'))
 
 

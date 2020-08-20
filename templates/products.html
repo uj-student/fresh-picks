@@ -21,8 +21,11 @@
 
                     <form action="/add" method="post" class="row">
                         <div class="col-lg-6 mb-5 ftco-animate">
-                            <a href="../static/images/product-1.jpg" class="image-popup"><img
-                                    src="{{ item.get_product_image() }}" class="img-fluid" alt="Colorlib Template"></a>
+                            <a href="../static/images/product-1.jpg" class="image-popup">
+                                <img src="{{ item.get_product_image() }}" class="img-fluid" alt="Colorlib Template">
+                                <input type="hidden" name="p-image" value="{{ item.get_product_image() }}"/>
+
+                            </a>
                         </div>
                         <div class="col-lg-6 product-details pl-md-5 ftco-animate">
                             <div class="product-name">
@@ -115,8 +118,11 @@
                 {% for item in extras %}
                     <div class="col-md-6 col-lg-3 ftco-animate">
                         <form action="/add" method="post" class="product">
-                            <a href="#" class="img-prod"><img class="img-fluid" src="{{ item.get_product_image() }}"
-                                                              alt="Colorlib Template">
+                            <a href="#" class="img-prod">
+                                <img class="img-fluid" src="{{ item.get_product_image() }}"
+                                     alt="Colorlib Template">
+                                <input type="hidden" name="p-image" value="{{ item.get_product_image() }}"/>
+
                                 {#    						            <span class="status">30%</span>#}
                                 {#    						            <div class="overlay"></div>#}
                             </a>
