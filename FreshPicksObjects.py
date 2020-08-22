@@ -139,3 +139,26 @@ class UserUpdatedDetails:
 
     def get_dob(self):
         return self.dob
+
+class Orders:
+    def __init__(self, customer_id, contents, total_price, delivery_address, instructions):
+        self.customer_id = customer_id
+        self.contents = contents
+        self.total_price = total_price
+        self.delivery_address = delivery_address
+        self.instructions = instructions
+
+    def get_customer_id(self):
+        return self.customer_id
+
+    def get_contents(self):
+        return self.contents
+
+    def get_total_price(self):
+        return self.total_price
+
+    def get_delivery_address(self):
+        return self.delivery_address
+
+    def get_instructions(self):
+        return self.instructions

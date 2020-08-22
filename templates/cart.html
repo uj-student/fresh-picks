@@ -5,21 +5,35 @@
 
     <section class="ftco-section ftco-cart">
         <div class="container">
-            <div class="row">
-                <div class="col-md-12 ftco-animate">
-                    <div class="cart-list">
-                        <table class="table">
-                            <thead class="thead-primary">
-                            <tr class="text-center">
-                                <th>&nbsp;</th>
-                                <th>&nbsp;</th>
-                                <th>Product name</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
-                                <th>Total</th>
-                            </tr>
-                            </thead>
-                            {% if 'my_cart' in session %}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <span>
+                        {{ message }}
+                        </span>
+                        </div>
+
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if 'my_cart' in session %}
+
+                <div class="row">
+                    <div class="col-md-12 ftco-animate">
+                        <div class="cart-list">
+                            <table class="table">
+                                <thead class="thead-primary">
+                                <tr class="text-center">
+                                    <th>&nbsp;</th>
+                                    <th>&nbsp;</th>
+                                    <th>Product name</th>
+                                    <th>Price</th>
+                                    <th>Quantity</th>
+                                    <th>Total</th>
+                                </tr>
+                                </thead>
                                 {% for k, v in session.get('my_cart').items() %}
                                     <tbody>
                                     <tr class="text-center">
@@ -52,77 +66,90 @@
                                         <td class="total">ZK{{ "%.2f"|format(v[0] * v[1]) }}</td>
                                     </tr><!-- END TR-->
                                     </tbody>
+
                                 {% endfor %}
-                            {% else: %}
-                                <h3>Empty Cart</h3>
-                            {% endif %}
-                        </table>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row justify-content-end">
-                {#                <div class="col-lg-4 mt-5 cart-wrap ftco-animate">#}
-                {#                    <div class="cart-total mb-3">#}
-                {#                        <h3>Coupon Code</h3>#}
-                {#                        <p>Enter your coupon code if you have one</p>#}
-                {#                        <form action="#" class="info">#}
-                {#                            <div class="form-group">#}
-                {#                                <label for="">Coupon code</label>#}
-                {#                                <input type="text" class="form-control text-left px-3" placeholder="">#}
-                {#                            </div>#}
-                {#                        </form>#}
-                {#                    </div>#}
-                {#                    <p><a href="checkout.html" class="btn btn-primary py-3 px-4">Apply Coupon</a></p>#}
-                {#                </div>#}
-                <div class="col-lg-6 mt-5 cart-wrap ftco-animate">
-                    <div class="cart-total mb-3">
-                        <h3>Use a different address?</h3>
-                        <p>Enter your delivery address</p>
-                        <form action="#" class="info">
-                            <div class="form-group">
-                                <label for="delivery-address">Delivery Address</label>
-                                <input type="text" class="form-control text-left px-3" name="delivery-address">
+                <div class="row justify-content-end">
+                    {#                <div class="col-lg-4 mt-5 cart-wrap ftco-animate">#}
+                    {#                    <div class="cart-total mb-3">#}
+                    {#                        <h3>Coupon Code</h3>#}
+                    {#                        <p>Enter your coupon code if you have one</p>#}
+                    {#                        <form action="#" class="info">#}
+                    {#                            <div class="form-group">#}
+                    {#                                <label for="">Coupon code</label>#}
+                    {#                                <input type="text" class="form-control text-left px-3" placeholder="">#}
+                    {#                            </div>#}
+                    {#                        </form>#}
+                    {#                    </div>#}
+                    {#                    <p><a href="checkout.html" class="btn btn-primary py-3 px-4">Apply Coupon</a></p>#}
+                    {#                </div>#}
+
+                    <div class="col-lg-6 mt-5 cart-wrap ftco-animate">
+                        <form action="/order" method="post" class="info">
+                            <div class="cart-total mb-3">
+                                <h2>Use a different address?</h2>
+                                <p>Enter your delivery address</p>
+                                <h6>If you want your delivery to go to a different address</h6>
+                                <div class="form-group">
+                                    <label for="delivery-address">Delivery Address</label>
+                                    <input type="text" class="form-control text-left px-3" name="delivery-address">
+                                </div>
+                                <div class="form-group">
+                                    <label for="town">Town / City</label>
+                                    <input type="text" class="form-control text-left px-3" name="town">
+                                </div>
+                                <div class="form-group">
+                                    <label for="instructions">Additional Instructions</label>
+                                    <input type="text" class="form-control text-left px-3" name="instructions">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="town">Town / City</label>
-                                <input type="text" class="form-control text-left px-3" name="town">
-                            </div>
-                            <div class="form-group">
-                                <label for="instructions">Additional Instructions</label>
-                                <input type="text" class="form-control text-left px-3" name="instructions">
-                            </div>
+
+                            {% block cart %}
+
+                                <div class="cart-total mb-3">
+                                    <h3>Cart Totals</h3>
+                                    <p class="d-flex">
+                                        <span>Subtotal</span>
+                                        <span>ZK{{ "%.2f"|format(session.get('total_price')) if 'my_cart' in session else 0 }}</span>
+                                    </p>
+                                    <p class="d-flex">
+                                        <span>Delivery</span>
+                                        <span>ZK0.00</span>
+                                    </p>
+                                    <p class="d-flex">
+                                        <span>Discount</span>
+                                        <span>ZK0.00</span>
+                                    </p>
+                                    <hr>
+                                    <p class="d-flex total-price">
+                                        <span>Total</span>
+                                        <span>ZK{{ "%.2f"|format(session.get('total_price')) if 'my_cart' in session else 0 }}</span>
+                                    </p>
+
+                                </div>
+                            {% endblock %}
+                            <p>
+                                <input type="submit" class="btn btn-primary py-3 px-4" value="Place Order"/>
+                            </p>
+                            {# <p>#}
+                            {#  <input type="submit" class="btn btn-primary py-3 px-4" value="Submit Address">#}
+                            {# </p>#}
                         </form>
                     </div>
-                    <p>
-                        <input type="submit" class="btn btn-primary py-3 px-4" value="Submit Address">
-                    </p>
                 </div>
-                <div class="col-lg-6 mt-5 cart-wrap ftco-animate">
-                    {% block cart %}
-                        <div class="cart-total mb-3">
-                            <h3>Cart Totals</h3>
-                            <p class="d-flex">
-                                <span>Subtotal</span>
-                                <span>ZK{{ "%.2f"|format(session.get('total_price')) if 'cart' in session else 0 }}</span>
-                            </p>
-                            <p class="d-flex">
-                                <span>Delivery</span>
-                                <span>ZK0.00</span>
-                            </p>
-                            <p class="d-flex">
-                                <span>Discount</span>
-                                <span>ZK0.00</span>
-                            </p>
-                            <hr>
-                            <p class="d-flex total-price">
-                                <span>Total</span>
-                                <span>ZK{{ "%.2f"|format(session.get('total_price')) if 'cart' in session else 0}}</span>
-                            </p>
-                        </div>
-                        <p><a href="checkout.html" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
-                    {% endblock %}
+            {% else: %}
+                <div class="col-lg-12 mt-5 cart-wrap ftco-animate">
+                    <div class="cart-total mb-3">
+                        <h2>Your cart is empty</h2>
+                        <p><a href="{{ url_for('products') }}" class="btn btn-primary py-3 px-4">Go
+                            Shopping</a></p>
+
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </section>
 

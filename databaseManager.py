@@ -146,3 +146,20 @@ def update_user(old_data, new_data):
         raise Exception
     finally:
         close_connection(conn)
+
+
+def create_order(my_order):
+    conn = get_connection()
+    try:
+        query = "insert into orders (customer_id, contents, total_price, delivery_address, additional_instructions) " \
+                "VALUES (:customer_id, :contents, :price, :address, :instructions)"
+        cursor = conn.cursor()
+        cursor.execute(query, (my_order.get_customer_id(), my_order.get_contents(), my_order.get_total_price(),
+                               my_order.get_delivery_address(), my_order.get_instructions()))
+        conn.commit()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)

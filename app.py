@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import Utils
 import Utils as util
 import databaseManager as db
-from FreshPicksObjects import User, UserUpdatedDetails
+from FreshPicksObjects import User, UserUpdatedDetails, Orders
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -214,6 +214,7 @@ def add_product_to_cart():
         session['total_price'] = total_price
     return redirect(url_for('products'))
 
+
 @app.route('/remove/<string:name>')
 def remove_product(name):
     total_price = 0
@@ -231,16 +232,43 @@ def remove_product(name):
             break
 
     if total_quantity < 1:
-        session.clear()
+        clear_cart()
     else:
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
 
     return redirect(url_for('cart'))
 
+
+def clear_cart():
+    session.pop('my_cart')
+    session['total_quantity'] = ""
+    session['total_price'] = 0
+
+
 @app.route('/wish')
 def wish():
     return render_template('wishlist.html')
+
+
+@app.route('/order', methods=['POST'])
+def process_order():
+    if request.method == "POST":
+        req = request.form
+        if 'my_cart' in session:
+            content = ""
+            for k, v in session['my_cart'].items():
+                content += f"{k} @ {v[0]} x {v[1]}\n"
+            order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
+                'user_address']
+
+            order_request = Orders(customer_id=session['user_id'], contents=content, total_price=session['total_price'],
+                                   delivery_address=order_address, instructions=req['instructions'])
+            db.create_order(order_request)
+            print(f"Contents: {content}\n{order_address}")
+            flash("Your order has been received.")
+            clear_cart()
+    return render_template('cart.html')
 
 
 def array_merge(first_array, second_array):
