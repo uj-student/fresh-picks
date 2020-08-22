@@ -84,9 +84,9 @@
                         <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                            aria-haspopup="true" aria-expanded="false">{{ session['user_first_name'] }}</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown04">
-                        <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
-                        <a class="dropdown-item" href="{{ url_for('account') }}">My Profile</a>
-                    </div>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                            <a class="dropdown-item" href="{{ url_for('account') }}">My Profile</a>
+                        </div>
                     </li>
                     <li class="nav-item cta cta-colored"><a href="{{ url_for('cart') }}" class="nav-link"><span
                             class="icon-shopping_cart"></span>{{ session['total_quantity'] }}</a></li>
@@ -219,7 +219,6 @@
                 stroke="#F96D00"/>
     </svg>
 </div>
-
 
 <script src="../static/js/jquery.min.js"></script>
 <script src="../static/js/jquery-migrate-3.0.1.min.js"></script>
