@@ -67,7 +67,6 @@ def get_user_profile(user_phone):
         cursor = conn.cursor()
         user_account = cursor.execute(query, (user_phone,)).fetchone()
         cursor.close()
-
     except Exception as error:
         traceback.print_exc()
         print()
@@ -86,7 +85,6 @@ def get_user_by_id(user_id):
         cursor = conn.cursor()
         user_account = cursor.execute(query, (user_id,)).fetchone()
         cursor.close()
-
     except Exception as error:
         traceback.print_exc()
         print()
@@ -142,6 +140,7 @@ def update_user(old_data, new_data):
             query = "UPDATE users SET dob = ? where id =? ;"
             cursor.execute(query, (new_data.get_dob(), old_data.get_id()))
         conn.commit()
+        cursor.close()
     except Exception:
         raise Exception
     finally:
@@ -157,6 +156,40 @@ def create_order(my_order):
         cursor.execute(query, (my_order.get_customer_id(), my_order.get_contents(), my_order.get_total_price(),
                                my_order.get_delivery_address(), my_order.get_instructions()))
         conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+
+def get_pending_orders():
+    conn = get_connection()
+    result = ""
+    try:
+        query = "select orders.id, fullname, contents, total_price, delivery_address, status, date from orders " \
+                "inner join users u on orders.customer_id = u.id where status = ? and updated_status = 0 ;"
+        cursor = conn.cursor()
+        result = cursor.execute(query, ("pending",)).fetchall()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+        return result
+
+def update_order_status(order_id):
+    conn = get_connection()
+    try:
+        query = "insert into orders_status(order_id) values (?);"
+        cursor = conn.cursor()
+        cursor.execute(query, order_id)
+        conn.commit()
+        cursor.close()
     except sqlite3.Error as error:
         traceback.print_exc()
         print(f'Failed to add user: \nProblem -> {error}')

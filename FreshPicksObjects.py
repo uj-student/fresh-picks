@@ -1,3 +1,6 @@
+import Utils
+
+
 class ProductObject:
     def __init__(self, name, description, price, image=None, is_main=False):
         self.name = name
@@ -141,12 +144,19 @@ class UserUpdatedDetails:
         return self.dob
 
 class Orders:
-    def __init__(self, customer_id, contents, total_price, delivery_address, instructions):
+    def __init__(self, customer_id, contents, total_price, delivery_address, date_created, instructions=None,
+                 status="pending", order_id=0):
+        self.order_id = order_id
         self.customer_id = customer_id
         self.contents = contents
         self.total_price = total_price
         self.delivery_address = delivery_address
         self.instructions = instructions
+        self.status = status
+        self.date_created = date_created
+
+    def get_order_id(self):
+        return self.order_id
 
     def get_customer_id(self):
         return self.customer_id
@@ -162,3 +172,9 @@ class Orders:
 
     def get_instructions(self):
         return self.instructions
+
+    def get_status(self):
+        return Utils.capitaliseName(self.status)
+
+    def get_date_created(self):
+        return self.date_created

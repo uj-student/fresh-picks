@@ -215,6 +215,16 @@ def add_product_to_cart():
     return redirect(url_for('products'))
 
 
+def array_merge(first_array, second_array):
+    if isinstance(first_array, list) and isinstance(second_array, list):
+        return first_array + second_array
+    elif isinstance(first_array, dict) and isinstance(second_array, dict):
+        return dict(list(first_array.items()) + list(second_array.items()))
+    elif isinstance(first_array, set) and isinstance(second_array, set):
+        return first_array.union(second_array)
+    return False
+
+
 @app.route('/remove/<string:name>')
 def remove_product(name):
     total_price = 0
@@ -271,15 +281,22 @@ def process_order():
     return render_template('cart.html')
 
 
-def array_merge(first_array, second_array):
-    if isinstance(first_array, list) and isinstance(second_array, list):
-        return first_array + second_array
-    elif isinstance(first_array, dict) and isinstance(second_array, dict):
-        return dict(list(first_array.items()) + list(second_array.items()))
-    elif isinstance(first_array, set) and isinstance(second_array, set):
-        return first_array.union(second_array)
-    return False
+@app.route('/admin')
+def manage_orders():
+    pending_orders = db.get_pending_orders()
+    orders_list = []
+    print(pending_orders)
+    for order in pending_orders:
+        orders_list.append(Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4], status=order[5], date_created=order[6], order_id=order[0]))
+    print(orders_list)
+    return render_template('admin/dashboard.html', orders_list=orders_list)
 
+@app.route('/mark_complete', methods=['POST'])
+def mark_complete():
+    if request.method == 'POST':
+        new_status = request.form['_order_status']
+        db.update_order_status()
+    return redirect(url_for('manage_orders'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,4 +1,5 @@
 import FreshPicksObjects as my_objects
+import stringcase
 def convert_to_Product(database_result):
     basket_items = []
     extra_items = []
@@ -24,3 +25,6 @@ def convert_to_User(database_record):
         database_record[6], # email column
         database_record[0] # db id
     )
+
+def capitaliseName(name):
+    return stringcase.capitalcase(name)
