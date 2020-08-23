@@ -1,5 +1,4 @@
-import Utils
-
+import FreshPicksUtilities
 
 class ProductObject:
     def __init__(self, name, description, price, image=None, is_main=False):
@@ -53,6 +52,9 @@ class User:
     def get_user_town(self):
         return self.town
 
+    def get_full_address(self):
+        return f"{self.address, self.town}"
+
     def get_user_country(self):
         return self.country
 
@@ -73,7 +75,6 @@ class User:
 
     def get_user_terms_and_conditions(self):
         return self.accepted
-
 
     def set_user_name(self, name):
         self.name = name
@@ -174,7 +175,7 @@ class Orders:
         return self.instructions
 
     def get_status(self):
-        return Utils.capitaliseName(self.status)
+        return FreshPicksUtilities.capitaliseName(self.status)
 
     def get_date_created(self):
         return self.date_created

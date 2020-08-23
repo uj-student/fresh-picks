@@ -3,8 +3,8 @@ import traceback
 from flask import Flask, g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import Utils
-import Utils as util
+import FreshPicksUtilities
+import FreshPicksUtilities as util
 import databaseManager as db
 from FreshPicksObjects import User, UserUpdatedDetails, Orders
 
@@ -64,7 +64,7 @@ def login():
         if user_profile is None:
             error = "Account could not be found. Have you registered?"
         else:
-            user_profile = Utils.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
             if not check_password_hash(user_profile.get_user_password(), req['enter-password']):
                 error = "Incorrect Password"
 
@@ -99,16 +99,16 @@ def signup():
             feedback = f"Password must be the same. Please try again."
             return render_template('sign-up.html', feedback=feedback)
         user_account = User(
-            req['full-name'],
-            req['home-address'],
-            req['town-city'],
-            req['state-country'],
-            str(req['phone-number']),
-            req['gender'],
-            req['dob'],
-            generate_password_hash(req['password']),
-            1,
-            req['email-address'],
+            fullname=req['full-name'],
+            address=req['home-address'],
+            town=req['town-city'],
+            country=req['state-country'],
+            phone_number=str(req['phone-number']).replace(" ", ""),
+            gender=req['gender'],
+            dob=req['dob'],
+            password=generate_password_hash(req['password']),
+            terms_and_conditions=1,
+            email_address=req['email-address']
         )
 
         try:
@@ -161,7 +161,7 @@ def account():
             db.update_user(old_data=current_user, new_data=new_user)
             flash("Details updated successfully")
             user_profile = db.get_user_by_id(session['user_id'])
-            user_profile = Utils.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
             setupUserSession(user_profile)
             return redirect(url_for('account'))
         else:
@@ -268,7 +268,7 @@ def process_order():
         if 'my_cart' in session:
             content = ""
             for k, v in session['my_cart'].items():
-                content += f"{k} @ {Utils.formatToCurrency(v[0])} x {v[1]}\n"
+                content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
             order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
                 'user_address']
 
@@ -285,11 +285,12 @@ def process_order():
 def manage_orders():
     pending_orders = db.get_pending_orders()
     orders_list = []
-    print(pending_orders)
     for order in pending_orders:
-        orders_list.append(Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4], status=order[5], date_created=order[6], order_id=order[0]))
-    print(orders_list)
+        orders_list.append(
+            Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4],
+                   status=order[5], date_created=order[6], order_id=order[0]))
     return render_template('admin/dashboard.html', orders_list=orders_list)
+
 
 @app.route('/mark_complete', methods=['POST'])
 def mark_complete():
@@ -299,6 +300,17 @@ def mark_complete():
         order_id = request.form['_order_id']
         db.update_order_status(new_status=new_status, old_status=current_status, order_id=order_id)
     return redirect(url_for('manage_orders'))
+
+
+@app.route('/customers')
+def customers():
+    user_list = db.get_all_customers()
+    customer_list = []
+    for customer in user_list:
+        customer_list.append(FreshPicksUtilities.convert_to_User(customer))
+    print(customer_list)
+    return render_template('admin/view_customers.html', customer_list=customer_list)
+
 
 if __name__ == '__main__':
     app.run(debug=True)

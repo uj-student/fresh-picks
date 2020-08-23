@@ -77,6 +77,23 @@ def get_user_profile(user_phone):
     return user_account
 
 
+def get_all_customers():
+    conn = get_connection()
+    user_account_list = ""
+    try:
+        query = "select * from users"
+        cursor = conn.cursor()
+        user_account_list = cursor.execute(query).fetchall()
+        cursor.close()
+    except Exception as error:
+        traceback.print_exc()
+        print()
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+    return user_account_list
+
 def get_user_by_id(user_id):
     conn = get_connection()
     user_account = ""
@@ -194,6 +211,7 @@ def update_order_status(order_id, old_status, new_status):
         conn.commit()
         cursor.close()
     except sqlite3.Error as error:
+        #need to test this... extensively!!!!
         conn.rollback()
         traceback.print_exc()
         print(f'Failed to add user: \nProblem -> {error}')
