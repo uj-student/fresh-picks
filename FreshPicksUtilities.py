@@ -32,8 +32,9 @@ def convert_to_User(database_record):
 
 
 def convert_to_order():
-    #TODO
+    # TODO
     pass
+
 
 def capitaliseName(name):
     return stringcase.capitalcase(name)
