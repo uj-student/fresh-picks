@@ -268,7 +268,7 @@ def process_order():
         if 'my_cart' in session:
             content = ""
             for k, v in session['my_cart'].items():
-                content += f"{k} @ {v[0]} x {v[1]}\n"
+                content += f"{k} @ {Utils.formatToCurrency(v[0])} x {v[1]}\n"
             order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
                 'user_address']
 
@@ -295,7 +295,9 @@ def manage_orders():
 def mark_complete():
     if request.method == 'POST':
         new_status = request.form['_order_status']
-        db.update_order_status()
+        current_status = request.form['_current_status']
+        order_id = request.form['_order_id']
+        db.update_order_status(new_status=new_status, old_status=current_status, order_id=order_id)
     return redirect(url_for('manage_orders'))
 
 if __name__ == '__main__':

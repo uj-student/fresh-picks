@@ -28,3 +28,6 @@ def convert_to_User(database_record):
 
 def capitaliseName(name):
     return stringcase.capitalcase(name)
+
+def formatToCurrency(amount):
+    return "%.2f".format(amount)

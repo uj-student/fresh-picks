@@ -170,9 +170,9 @@ def get_pending_orders():
     result = ""
     try:
         query = "select orders.id, fullname, contents, total_price, delivery_address, status, date from orders " \
-                "inner join users u on orders.customer_id = u.id where status = ? and updated_status = 0 ;"
+                "inner join users u on orders.customer_id = u.id where status = ? and updated_status = ?;"
         cursor = conn.cursor()
-        result = cursor.execute(query, ("pending",)).fetchall()
+        result = cursor.execute(query, ("pending", 0)).fetchall()
         cursor.close()
     except sqlite3.Error as error:
         traceback.print_exc()
@@ -188,9 +188,13 @@ def update_order_status(order_id, old_status, new_status):
         query = "insert into orders_status(order_id, previous_status, current_status) values (:id, :old_status, :new_status);"
         cursor = conn.cursor()
         cursor.execute(query, (order_id, old_status, new_status))
+        # this 2nd query might need to be a scheduled overnight query should performance dip
+        query = "UPDATE orders SET updated_status = ? where id =? ;"
+        cursor.execute(query, (1,order_id))
         conn.commit()
         cursor.close()
     except sqlite3.Error as error:
+        conn.rollback()
         traceback.print_exc()
         print(f'Failed to add user: \nProblem -> {error}')
         raise Exception(error)
