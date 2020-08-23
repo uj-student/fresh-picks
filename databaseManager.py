@@ -182,12 +182,12 @@ def get_pending_orders():
         close_connection(conn)
         return result
 
-def update_order_status(order_id):
+def update_order_status(order_id, old_status, new_status):
     conn = get_connection()
     try:
-        query = "insert into orders_status(order_id) values (?);"
+        query = "insert into orders_status(order_id, previous_status, current_status) values (:id, :old_status, :new_status);"
         cursor = conn.cursor()
-        cursor.execute(query, order_id)
+        cursor.execute(query, (order_id, old_status, new_status))
         conn.commit()
         cursor.close()
     except sqlite3.Error as error:
