@@ -1,6 +1,6 @@
 import sqlite3
 import traceback
-
+import time
 
 def get_connection():
     try:
@@ -182,14 +182,31 @@ def create_order(my_order):
         close_connection(conn)
 
 
-def get_pending_orders():
+def get_all_orders():
     conn = get_connection()
     result = ""
     try:
         query = "select orders.id, fullname, contents, total_price, delivery_address, status, date from orders " \
-                "inner join users u on orders.customer_id = u.id where status = ? and updated_status = ?;"
+                "inner join users u on orders.customer_id = u.id order by orders.id desc;"
         cursor = conn.cursor()
-        result = cursor.execute(query, ("pending", 0)).fetchall()
+        result = cursor.execute(query).fetchall()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+        return result
+
+def get_orders_by_status(status):
+    conn = get_connection()
+    result = ""
+    try:
+        query = "select orders.id, fullname, contents, total_price, delivery_address, status, date from orders " \
+                "inner join users u on orders.customer_id = u.id where status = ?;"
+        cursor = conn.cursor()
+        result = cursor.execute(query, (status,)).fetchall()
         cursor.close()
     except sqlite3.Error as error:
         traceback.print_exc()
@@ -207,7 +224,7 @@ def update_order_status(order_id, old_status, new_status):
         cursor.execute(query, (order_id, old_status, new_status))
         # this 2nd query might need to be a scheduled overnight query should performance dip
         query = "UPDATE orders SET updated_status = ? where id =? ;"
-        cursor.execute(query, (1,order_id))
+        cursor.execute(query, (1, time.strftime("%Y-%m-%d %H:%M:%S")))
         conn.commit()
         cursor.close()
     except sqlite3.Error as error:

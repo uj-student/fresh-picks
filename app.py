@@ -40,7 +40,6 @@ def cart():
 
 @app.route('/products')
 def products():
-    # session.clear()
     product_list = db.get_products()
     basket_list, extra_list = util.convert_to_Product(product_list)
     return render_template('products.html', baskets=basket_list, extras=extra_list)
@@ -281,15 +280,34 @@ def process_order():
     return render_template('cart.html')
 
 
-@app.route('/admin')
-def manage_orders():
-    pending_orders = db.get_pending_orders()
+@app.route('/admin/<path:view>')
+def admin_view(view):
     orders_list = []
-    for order in pending_orders:
-        orders_list.append(
-            Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4],
-                   status=order[5], date_created=order[6], order_id=order[0]))
-    return render_template('admin/dashboard.html', orders_list=orders_list)
+    orders = ""
+    if "orders" in view:
+        if view == "pending_orders":
+            orders = db.get_orders_by_status("pending")
+        elif view == "completed_orders":
+            orders = db.get_orders_by_status("complete")
+        elif view == "all_orders":
+            orders = db.get_all_orders()
+        for order in orders:
+            orders_list.append(
+                Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4],
+                       status=order[5], date_created=order[6], order_id=order[0]))
+        return render_template('admin/dashboard.html', orders_list=orders_list)
+    elif view == "customers":
+        user_list = db.get_all_customers()
+        customer_list = []
+        for customer in user_list:
+            customer_list.append(FreshPicksUtilities.convert_to_User(customer))
+        return render_template('admin/view_customers.html', customer_list=customer_list)
+    elif view == "products":
+        product_list = db.get_products()
+        basket_list, extra_list = util.convert_to_Product(product_list)
+        basket_list = array_merge(basket_list, extra_list)
+        return render_template('admin/manage_products.html', basket_list=basket_list)
+    return render_template('admin/manage_products.html', basket_list=[])
 
 
 @app.route('/mark_complete', methods=['POST'])
@@ -299,17 +317,7 @@ def mark_complete():
         current_status = request.form['_current_status']
         order_id = request.form['_order_id']
         db.update_order_status(new_status=new_status, old_status=current_status, order_id=order_id)
-    return redirect(url_for('manage_orders'))
-
-
-@app.route('/customers')
-def customers():
-    user_list = db.get_all_customers()
-    customer_list = []
-    for customer in user_list:
-        customer_list.append(FreshPicksUtilities.convert_to_User(customer))
-    print(customer_list)
-    return render_template('admin/view_customers.html', customer_list=customer_list)
+    return redirect(url_for('admin_view'))
 
 
 if __name__ == '__main__':

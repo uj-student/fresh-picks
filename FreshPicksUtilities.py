@@ -7,8 +7,8 @@ def convert_to_Product(database_result):
     basket_items = []
     extra_items = []
     for result in database_result:
-        new_entry = my_objects.ProductObject(result[1], result[2], result[3], result[4], result[5])
-        if new_entry.is_main:
+        new_entry = my_objects.ProductObject(result[0], result[1], result[2], result[3], result[4], result[5])
+        if new_entry.get_is_main():
             basket_items.append(new_entry)
         else:
             extra_items.append(new_entry)
