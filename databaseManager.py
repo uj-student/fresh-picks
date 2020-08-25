@@ -1,6 +1,6 @@
 import sqlite3
 import traceback
-
+import time
 
 def get_connection():
     try:
@@ -67,7 +67,6 @@ def get_user_profile(user_phone):
         cursor = conn.cursor()
         user_account = cursor.execute(query, (user_phone,)).fetchone()
         cursor.close()
-
     except Exception as error:
         traceback.print_exc()
         print()
@@ -78,6 +77,23 @@ def get_user_profile(user_phone):
     return user_account
 
 
+def get_all_customers():
+    conn = get_connection()
+    user_account_list = ""
+    try:
+        query = "select * from users"
+        cursor = conn.cursor()
+        user_account_list = cursor.execute(query).fetchall()
+        cursor.close()
+    except Exception as error:
+        traceback.print_exc()
+        print()
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+    return user_account_list
+
 def get_user_by_id(user_id):
     conn = get_connection()
     user_account = ""
@@ -86,7 +102,6 @@ def get_user_by_id(user_id):
         cursor = conn.cursor()
         user_account = cursor.execute(query, (user_id,)).fetchone()
         cursor.close()
-
     except Exception as error:
         traceback.print_exc()
         print()
@@ -142,6 +157,7 @@ def update_user(old_data, new_data):
             query = "UPDATE users SET dob = ? where id =? ;"
             cursor.execute(query, (new_data.get_dob(), old_data.get_id()))
         conn.commit()
+        cursor.close()
     except Exception:
         raise Exception
     finally:
@@ -157,7 +173,63 @@ def create_order(my_order):
         cursor.execute(query, (my_order.get_customer_id(), my_order.get_contents(), my_order.get_total_price(),
                                my_order.get_delivery_address(), my_order.get_instructions()))
         conn.commit()
+        cursor.close()
     except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+
+def get_all_orders():
+    conn = get_connection()
+    result = ""
+    try:
+        query = "select orders.id, fullname, contents, total_price, delivery_address, status, date from orders " \
+                "inner join users u on orders.customer_id = u.id order by orders.id desc;"
+        cursor = conn.cursor()
+        result = cursor.execute(query).fetchall()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+        return result
+
+def get_orders_by_status(status):
+    conn = get_connection()
+    result = ""
+    try:
+        query = "select orders.id, fullname, contents, total_price, delivery_address, status, date from orders " \
+                "inner join users u on orders.customer_id = u.id where status = ?;"
+        cursor = conn.cursor()
+        result = cursor.execute(query, (status,)).fetchall()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+        return result
+
+def update_order_status(order_id, old_status, new_status):
+    conn = get_connection()
+    try:
+        query = "insert into orders_status(order_id, previous_status, current_status) values (:id, :old_status, :new_status);"
+        cursor = conn.cursor()
+        cursor.execute(query, (order_id, old_status, new_status))
+        # this 2nd query might need to be a scheduled overnight query should performance dip
+        query = "UPDATE orders SET updated_status = ? where id =? ;"
+        cursor.execute(query, (1, time.strftime("%Y-%m-%d %H:%M:%S")))
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        #need to test this... extensively!!!!
+        conn.rollback()
         traceback.print_exc()
         print(f'Failed to add user: \nProblem -> {error}')
         raise Exception(error)

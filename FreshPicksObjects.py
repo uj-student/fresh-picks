@@ -1,10 +1,16 @@
+import FreshPicksUtilities
+
 class ProductObject:
-    def __init__(self, name, description, price, image=None, is_main=False):
+    def __init__(self, product_id, name, description, price, image=None, is_main=False):
+        self.product_id = product_id
         self.name = name
         self.description = description
         self.price = price
         self.image = image
         self.is_main = is_main
+
+    def get_product_id(self):
+        return self.product_id
 
     def get_product_name(self):
         return self.name
@@ -18,8 +24,8 @@ class ProductObject:
     def get_product_image(self):
         return self.image
 
-    def is_main(self):
-        return  self.is_main
+    def get_is_main(self):
+        return self.is_main
 
 class User:
     def __init__(self, fullname, address, town, country, phone_number, gender, dob, password, terms_and_conditions, email_address="", db_id =0):
@@ -50,6 +56,9 @@ class User:
     def get_user_town(self):
         return self.town
 
+    def get_full_address(self):
+        return f"{self.address, self.town}"
+
     def get_user_country(self):
         return self.country
 
@@ -70,7 +79,6 @@ class User:
 
     def get_user_terms_and_conditions(self):
         return self.accepted
-
 
     def set_user_name(self, name):
         self.name = name
@@ -141,12 +149,19 @@ class UserUpdatedDetails:
         return self.dob
 
 class Orders:
-    def __init__(self, customer_id, contents, total_price, delivery_address, instructions):
+    def __init__(self, customer_id, contents, total_price, delivery_address, date_created, instructions=None,
+                 status="pending", order_id=0):
+        self.order_id = order_id
         self.customer_id = customer_id
         self.contents = contents
         self.total_price = total_price
         self.delivery_address = delivery_address
         self.instructions = instructions
+        self.status = status
+        self.date_created = date_created
+
+    def get_order_id(self):
+        return self.order_id
 
     def get_customer_id(self):
         return self.customer_id
@@ -162,3 +177,9 @@ class Orders:
 
     def get_instructions(self):
         return self.instructions
+
+    def get_status(self):
+        return FreshPicksUtilities.capitaliseName(self.status)
+
+    def get_date_created(self):
+        return self.date_created

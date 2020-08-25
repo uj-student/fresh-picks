@@ -3,8 +3,8 @@ import traceback
 from flask import Flask, g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import Utils
-import Utils as util
+import FreshPicksUtilities
+import FreshPicksUtilities as util
 import databaseManager as db
 from FreshPicksObjects import User, UserUpdatedDetails, Orders
 
@@ -40,7 +40,6 @@ def cart():
 
 @app.route('/products')
 def products():
-    # session.clear()
     product_list = db.get_products()
     basket_list, extra_list = util.convert_to_Product(product_list)
     return render_template('products.html', baskets=basket_list, extras=extra_list)
@@ -64,7 +63,7 @@ def login():
         if user_profile is None:
             error = "Account could not be found. Have you registered?"
         else:
-            user_profile = Utils.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
             if not check_password_hash(user_profile.get_user_password(), req['enter-password']):
                 error = "Incorrect Password"
 
@@ -99,16 +98,16 @@ def signup():
             feedback = f"Password must be the same. Please try again."
             return render_template('sign-up.html', feedback=feedback)
         user_account = User(
-            req['full-name'],
-            req['home-address'],
-            req['town-city'],
-            req['state-country'],
-            str(req['phone-number']),
-            req['gender'],
-            req['dob'],
-            generate_password_hash(req['password']),
-            1,
-            req['email-address'],
+            fullname=req['full-name'],
+            address=req['home-address'],
+            town=req['town-city'],
+            country=req['state-country'],
+            phone_number=str(req['phone-number']).replace(" ", ""),
+            gender=req['gender'],
+            dob=req['dob'],
+            password=generate_password_hash(req['password']),
+            terms_and_conditions=1,
+            email_address=req['email-address']
         )
 
         try:
@@ -161,7 +160,7 @@ def account():
             db.update_user(old_data=current_user, new_data=new_user)
             flash("Details updated successfully")
             user_profile = db.get_user_by_id(session['user_id'])
-            user_profile = Utils.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
             setupUserSession(user_profile)
             return redirect(url_for('account'))
         else:
@@ -215,6 +214,16 @@ def add_product_to_cart():
     return redirect(url_for('products'))
 
 
+def array_merge(first_array, second_array):
+    if isinstance(first_array, list) and isinstance(second_array, list):
+        return first_array + second_array
+    elif isinstance(first_array, dict) and isinstance(second_array, dict):
+        return dict(list(first_array.items()) + list(second_array.items()))
+    elif isinstance(first_array, set) and isinstance(second_array, set):
+        return first_array.union(second_array)
+    return False
+
+
 @app.route('/remove/<string:name>')
 def remove_product(name):
     total_price = 0
@@ -258,7 +267,7 @@ def process_order():
         if 'my_cart' in session:
             content = ""
             for k, v in session['my_cart'].items():
-                content += f"{k} @ {v[0]} x {v[1]}\n"
+                content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
             order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
                 'user_address']
 
@@ -271,14 +280,44 @@ def process_order():
     return render_template('cart.html')
 
 
-def array_merge(first_array, second_array):
-    if isinstance(first_array, list) and isinstance(second_array, list):
-        return first_array + second_array
-    elif isinstance(first_array, dict) and isinstance(second_array, dict):
-        return dict(list(first_array.items()) + list(second_array.items()))
-    elif isinstance(first_array, set) and isinstance(second_array, set):
-        return first_array.union(second_array)
-    return False
+@app.route('/admin/<path:view>')
+def admin_view(view):
+    orders_list = []
+    orders = ""
+    if "orders" in view:
+        if view == "pending_orders":
+            orders = db.get_orders_by_status("pending")
+        elif view == "completed_orders":
+            orders = db.get_orders_by_status("complete")
+        elif view == "all_orders":
+            orders = db.get_all_orders()
+        for order in orders:
+            orders_list.append(
+                Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4],
+                       status=order[5], date_created=order[6], order_id=order[0]))
+        return render_template('admin/dashboard.html', orders_list=orders_list)
+    elif view == "customers":
+        user_list = db.get_all_customers()
+        customer_list = []
+        for customer in user_list:
+            customer_list.append(FreshPicksUtilities.convert_to_User(customer))
+        return render_template('admin/view_customers.html', customer_list=customer_list)
+    elif view == "products":
+        product_list = db.get_products()
+        basket_list, extra_list = util.convert_to_Product(product_list)
+        basket_list = array_merge(basket_list, extra_list)
+        return render_template('admin/manage_products.html', basket_list=basket_list)
+    return render_template('admin/manage_products.html', basket_list=[])
+
+
+@app.route('/mark_complete', methods=['POST'])
+def mark_complete():
+    if request.method == 'POST':
+        new_status = request.form['_order_status']
+        current_status = request.form['_current_status']
+        order_id = request.form['_order_id']
+        db.update_order_status(new_status=new_status, old_status=current_status, order_id=order_id)
+    return redirect(url_for('admin_view'))
 
 
 if __name__ == '__main__':
