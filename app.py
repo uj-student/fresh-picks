@@ -6,7 +6,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import FreshPicksUtilities
 import FreshPicksUtilities as util
 import databaseManager as db
-from FreshPicksObjects import User, UserUpdatedDetails, Orders
+from FreshPicksObjects import User, UserUpdatedDetails, Orders, ProductObject
+import time
+import os
+from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -41,7 +44,7 @@ def cart():
 @app.route('/products')
 def products():
     product_list = db.get_products()
-    basket_list, extra_list = util.convert_to_Product(product_list)
+    basket_list, extra_list = util.convert_db_result_to_product(product_list)
     basket_display_list = []
     for basket in basket_list:
         if basket.get_is_display() == 1:
@@ -71,7 +74,7 @@ def login():
         if user_profile is None:
             error = "Account could not be found. Have you registered?"
         else:
-            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_db_result_to_user(user_profile)
             if not check_password_hash(user_profile.get_user_password(), req['enter-password']):
                 error = "Incorrect Password"
 
@@ -168,7 +171,7 @@ def account():
             db.update_user(old_data=current_user, new_data=new_user)
             flash("Details updated successfully")
             user_profile = db.get_user_by_id(session['user_id'])
-            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_db_result_to_user(user_profile)
             setupUserSession(user_profile)
             return redirect(url_for('account'))
         else:
@@ -317,11 +320,11 @@ def admin_view(view):
         user_list = db.get_all_customers()
         customer_list = []
         for customer in user_list:
-            customer_list.append(FreshPicksUtilities.convert_to_User(customer))
+            customer_list.append(FreshPicksUtilities.convert_db_result_to_user(customer))
         return render_template('admin/manage_customers.html', customer_list=customer_list)
     elif view == "products":
         product_list = db.get_products()
-        basket_list, extra_list = util.convert_to_Product(product_list)
+        basket_list, extra_list = util.convert_db_result_to_product(product_list)
         basket_list = array_merge(basket_list, extra_list)
         return render_template('admin/manage_products.html', basket_list=basket_list)
     return render_template('admin/manage_products.html', basket_list=[])
@@ -345,7 +348,35 @@ def toggle_product_display(product_id, display):
 
 @app.route('/admin/products/add', methods=['POST', 'GET'])
 def add_product():
+    if request.method == "POST":
+        req = request.form
+        # image_location = upload_picture(req['display-image'])
+        print(req['display-image'])
+        upload_picture(req['display-image'])
+        new_product = ProductObject(
+            name=req['product-name'],
+            description=req['product-description'],
+            price=req['price'],
+            image="image_location",
+            is_main=req['type'],
+            is_display=req['show']
+        )
+        print(f"{new_product} new_product")
+        # db.add_product(new_product)
     return render_template('admin/add_products.html')
+
+
+def upload_picture(uploaded_picture):
+    f_name, f_ext = os.path.splitext(uploaded_picture.filename)
+    image_name = f_name + round(time.time()) + f_ext
+    image_path = os.path.join(app.root_path, 'static/images', image_name)
+    resize = (300, 300)
+    resize_image = Image.open(uploaded_picture)
+    resize_image.thumbnail(resize)
+    resize_image.save(image_path)
+    return image_name
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -3,11 +3,18 @@ import stringcase
 import FreshPicksObjects as my_objects
 
 
-def convert_to_Product(database_result):
+def convert_db_result_to_product(database_result):
     basket_items = []
     extra_items = []
     for result in database_result:
-        new_entry = my_objects.ProductObject(result[0], result[1], result[2], result[3], result[4], result[5], result[6])
+        new_entry = my_objects.ProductObject(
+            product_id=result[0],
+            name=result[1],
+            description=result[2],
+            price=result[3],
+            image=result[4],
+            is_main=result[5],
+            is_display=result[6])
         if new_entry.get_is_main():
             basket_items.append(new_entry)
         else:
@@ -15,7 +22,7 @@ def convert_to_Product(database_result):
     return basket_items, extra_items
 
 
-def convert_to_User(database_record):
+def convert_db_result_to_user(database_record):
     return my_objects.User(
         fullname=database_record[1],
         address=database_record[2],

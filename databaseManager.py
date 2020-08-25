@@ -250,3 +250,20 @@ def change_product_display(display, product_id):
         raise Exception(error)
     finally:
         close_connection(conn)
+
+def add_product(new_product):
+    conn = get_connection()
+    try:
+        query = "insert into products (name, description, price, image_location, is_main, is_displayed)  values " \
+                "(:name, :description, :price, :image_location, :is_main, :isdisplayed);"
+        cursor = conn.cursor()
+        cursor.execute(query, (new_product.get_product_name(), new_product.get_product_description(), new_product.get_product_price(),
+                               new_product.get_product_image(), new_product.get_is_main(), new_product.get_is_display()))
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)

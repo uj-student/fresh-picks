@@ -1,7 +1,7 @@
 import FreshPicksUtilities
 
 class ProductObject:
-    def __init__(self, product_id, name, description, price, image=None, is_main=False, is_display=False):
+    def __init__(self, name, description, price, product_id=0, image=None, is_main=False, is_display=False):
         self.product_id = product_id
         self.name = name
         self.description = description
