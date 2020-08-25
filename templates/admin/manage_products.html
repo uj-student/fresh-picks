@@ -1,0 +1,73 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Dashboard{% endblock %}
+{% block content %}
+
+    <section class="ftco-section ftco-cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+
+                        <div>
+                            <input type="button" value="Add Product +" class="col-md-3 btn btn-black py-3 px-3">
+                        </div>
+                        <table class="table">
+                            <thead class="thead-primary">
+                            <tr class="text-center">
+                                <th></th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Basket</th>
+                                <th>Price</th>
+                                <th>Display</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if basket_list %}
+                                {% for item in basket_list %}
+                                    <tr class="text-center">
+                                        <td class="image-prod">
+                                            <div class="img"
+                                                 style="background-image:url({{ item.get_product_image() }});"></div>
+                                        </td>
+
+                                        <td class="product-name">
+                                            <h6>{{ item.get_product_name() }}</h6>
+                                        </td>
+
+                                        <td class="product-name">
+                                            <h6>{{ item.get_product_description() }}</h6>
+                                        </td>
+
+                                        <td class="product-name">
+                                            <h6>{{ "Yes" if item.get_is_main() == 1 else "No" }}</h6>
+                                        </td>
+
+                                        <td class="product-name">
+                                        <td class="product-name">
+                                            <h6>{{ item.get_product_price() }}</h6>
+                                        </td>
+
+                                        <td class="product-name">
+                                            <a href="{{ url_for('toggle_product_display', product_id=item.get_product_id(),
+                                            display=item.get_is_display()) }}" class="alert-link">
+                                                {% if  item.get_is_display() == 1 %}
+                                                    <h6>{{ "Yes" }}</h6>
+                                                    <span class="ion-ios-checkmark-circle-outline"></span>
+                                                {% else %}
+                                                    <h6>{{ "No" }}</h6>
+                                                    <span class="ion-ios-close-circle-outline"></span>
+                                                {% endif %}
+                                        </td>
+                                    </tr><!-- END TR-->
+                                {% endfor %}
+                            {% endif %}
+                            </tbody><!-- END TBODY-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
