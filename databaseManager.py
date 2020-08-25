@@ -235,3 +235,18 @@ def update_order_status(order_id, old_status, new_status):
         raise Exception(error)
     finally:
         close_connection(conn)
+
+def change_product_display(display, product_id):
+    conn = get_connection()
+    try:
+        query = "update products set is_displayed = ? where id = ?;"
+        cursor = conn.cursor()
+        cursor.execute(query, (display, product_id))
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)

@@ -10,10 +10,9 @@
                     {% for message in messages %}
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <span>
-                        {{ message }}
+                            {{ message }}
                         </span>
                         </div>
-
                     {% endfor %}
                 {% endif %}
             {% endwith %}
@@ -38,7 +37,7 @@
                                     <tbody>
                                     <tr class="text-center">
                                         <td class="product-remove">
-                                            <a href="{{ url_for('remove_product', name=k) }}">
+                                            <a href="{{ url_for('remove_product_from_cart', name=k) }}">
                                                 <span class="ion-ios-close"></span>
                                             </a>
                                         </td>
