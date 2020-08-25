@@ -42,7 +42,15 @@ def cart():
 def products():
     product_list = db.get_products()
     basket_list, extra_list = util.convert_to_Product(product_list)
-    return render_template('products.html', baskets=basket_list, extras=extra_list)
+    basket_display_list = []
+    for basket in basket_list:
+        if basket.get_is_display() == 1:
+            basket_display_list.append(basket)
+    extras_display_list = []
+    for extra in extra_list:
+        if extra.get_is_display() == 1:
+            extras_display_list.append(extra)
+    return render_template('products.html', baskets=basket_display_list, extras=extras_display_list)
 
 
 @app.before_request
@@ -225,7 +233,7 @@ def array_merge(first_array, second_array):
 
 
 @app.route('/remove/<string:name>')
-def remove_product(name):
+def remove_product_from_cart(name):
     total_price = 0
     total_quantity = 0
 
@@ -279,6 +287,13 @@ def process_order():
             clear_cart()
     return render_template('cart.html')
 
+#an idea
+my_views ={
+    "pending": "pending_orders",
+    "complete": "completed_orders",
+    "cancel": "cancelled_orders",
+    "all": "all_orders"
+}
 
 @app.route('/admin/<path:view>')
 def admin_view(view):
@@ -289,19 +304,21 @@ def admin_view(view):
             orders = db.get_orders_by_status("pending")
         elif view == "completed_orders":
             orders = db.get_orders_by_status("complete")
+        elif view == "cancelled_orders":
+            orders = db.get_orders_by_status("cancel")
         elif view == "all_orders":
             orders = db.get_all_orders()
         for order in orders:
             orders_list.append(
                 Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4],
                        status=order[5], date_created=order[6], order_id=order[0]))
-        return render_template('admin/dashboard.html', orders_list=orders_list)
+        return render_template('admin/manage_orders.html', orders_list=orders_list)
     elif view == "customers":
         user_list = db.get_all_customers()
         customer_list = []
         for customer in user_list:
             customer_list.append(FreshPicksUtilities.convert_to_User(customer))
-        return render_template('admin/view_customers.html', customer_list=customer_list)
+        return render_template('admin/manage_customers.html', customer_list=customer_list)
     elif view == "products":
         product_list = db.get_products()
         basket_list, extra_list = util.convert_to_Product(product_list)
@@ -317,8 +334,14 @@ def mark_complete():
         current_status = request.form['_current_status']
         order_id = request.form['_order_id']
         db.update_order_status(new_status=new_status, old_status=current_status, order_id=order_id)
-    return redirect(url_for('admin_view'))
+    return redirect(url_for('admin_view', view="pending_orders"))
 
+
+@app.route('/admin/remove/<int:product_id>/<int:display>')
+def toggle_product_display(product_id, display):
+    display = 1 - display
+    db.change_product_display(display=display, product_id=product_id)
+    return redirect((url_for('admin_view', view="products")))
 
 if __name__ == '__main__':
     app.run(debug=True)

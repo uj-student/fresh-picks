@@ -1,13 +1,14 @@
 import FreshPicksUtilities
 
 class ProductObject:
-    def __init__(self, product_id, name, description, price, image=None, is_main=False):
+    def __init__(self, product_id, name, description, price, image=None, is_main=False, is_display=False):
         self.product_id = product_id
         self.name = name
         self.description = description
         self.price = price
         self.image = image
         self.is_main = is_main
+        self.is_display = is_display
 
     def get_product_id(self):
         return self.product_id
@@ -26,6 +27,9 @@ class ProductObject:
 
     def get_is_main(self):
         return self.is_main
+
+    def get_is_display(self):
+        return self.is_display
 
 class User:
     def __init__(self, fullname, address, town, country, phone_number, gender, dob, password, terms_and_conditions, email_address="", db_id =0):
