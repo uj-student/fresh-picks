@@ -343,5 +343,9 @@ def toggle_product_display(product_id, display):
     db.change_product_display(display=display, product_id=product_id)
     return redirect((url_for('admin_view', view="products")))
 
+@app.route('/admin/products/add', methods=['POST', 'GET'])
+def add_product():
+    return render_template('admin/add_products.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
