@@ -267,3 +267,8 @@ def add_product(new_product):
         raise Exception(error)
     finally:
         close_connection(conn)
+
+
+# con = get_connection()
+# cur = con.cursor()
+# print(cur.execute("select is_displayed from products;").fetchall())

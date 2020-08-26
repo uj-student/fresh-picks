@@ -1,5 +1,8 @@
+import os
+import time
 import traceback
 
+from PIL import Image
 from flask import Flask, g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -7,9 +10,6 @@ import FreshPicksUtilities
 import FreshPicksUtilities as util
 import databaseManager as db
 from FreshPicksObjects import User, UserUpdatedDetails, Orders, ProductObject
-import time
-import os
-from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -290,13 +290,15 @@ def process_order():
             clear_cart()
     return render_template('cart.html')
 
-#an idea
-my_views ={
+
+# an idea
+my_views = {
     "pending": "pending_orders",
     "complete": "completed_orders",
     "cancel": "cancelled_orders",
     "all": "all_orders"
 }
+
 
 @app.route('/admin/<path:view>')
 def admin_view(view):
@@ -346,36 +348,35 @@ def toggle_product_display(product_id, display):
     db.change_product_display(display=display, product_id=product_id)
     return redirect((url_for('admin_view', view="products")))
 
+
 @app.route('/admin/products/add', methods=['POST', 'GET'])
 def add_product():
     if request.method == "POST":
         req = request.form
-        # image_location = upload_picture(req['display-image'])
-        print(req['display-image'])
-        upload_picture(req['display-image'])
+        image_location = upload_picture(request.files['display-image'])
         new_product = ProductObject(
             name=req['product-name'],
             description=req['product-description'],
             price=req['price'],
-            image="image_location",
-            is_main=req['type'],
-            is_display=req['show']
+            image="/"+image_location,
+            is_main=0 if req['type']== "extra" else 1,
+            is_display=1 if req['display'] == "yes" else 0
         )
-        print(f"{new_product} new_product")
-        # db.add_product(new_product)
+        db.add_product(new_product)
+        return redirect(url_for('add_product'))
     return render_template('admin/add_products.html')
 
 
 def upload_picture(uploaded_picture):
     f_name, f_ext = os.path.splitext(uploaded_picture.filename)
-    image_name = f_name + round(time.time()) + f_ext
-    image_path = os.path.join(app.root_path, 'static/images', image_name)
+    image_name = f_name + str(round(time.time())) + f_ext
+    # image_path = os.path.join(app.root_path, 'static/images', image_name)
+    image_path = 'static/images/' + image_name
     resize = (300, 300)
     resize_image = Image.open(uploaded_picture)
     resize_image.thumbnail(resize)
     resize_image.save(image_path)
-    return image_name
-
+    return image_path
 
 
 if __name__ == '__main__':
