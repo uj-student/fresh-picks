@@ -268,7 +268,19 @@ def add_product(new_product):
     finally:
         close_connection(conn)
 
-
-# con = get_connection()
-# cur = con.cursor()
-# print(cur.execute("select is_displayed from products;").fetchall())
+def add_admin_user(new_admin):
+    conn = get_connection()
+    try:
+        query = "insert into admin_users (username, password, cellphone_number, name, email_address) values " \
+                "(:username, :password, :cellphone_number, :name, :email_address);"
+        cursor = conn.cursor()
+        cursor.execute(query, (new_admin.get_username(), new_admin.get_password(), new_admin.get_cellphone(), new_admin.get_name(),
+                               new_admin.get_email()))
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)

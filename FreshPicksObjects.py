@@ -1,5 +1,6 @@
 import FreshPicksUtilities
 
+
 class ProductObject:
     def __init__(self, name, description, price, product_id=0, image=None, is_main=False, is_display=False):
         self.product_id = product_id
@@ -31,15 +32,41 @@ class ProductObject:
     def get_is_display(self):
         return self.is_display
 
+
+class AdminUser:
+    def __init__(self, username, password, cellphone, name, email):
+        self.username = username
+        self.password = password
+        self.cellphone = cellphone
+        self.name = name
+        self.email = email
+
+    def get_username(self):
+        return self.username
+
+    def get_password(self):
+        return self.password
+
+    def get_cellphone(self):
+        return self.cellphone
+
+    def get_name(self):
+        return self.name
+
+    def get_email(self):
+        return self.email
+
+
 class User:
-    def __init__(self, fullname, address, town, country, phone_number, gender, dob, password, terms_and_conditions, email_address="", db_id =0):
+    def __init__(self, fullname, address, town, country, phone_number, gender, dob, password, terms_and_conditions,
+                 email_address="", db_id=0):
         self.id = db_id
         self.name = fullname
         self.address = address
         self.town = town
         self.country = country
         self.phone_number = phone_number
-        self.gender =gender
+        self.gender = gender
         self.birthday = dob
         self.password = password
         self.accepted = terms_and_conditions
@@ -117,6 +144,7 @@ class User:
     def set_user_id(self, db_id):
         self.id = db_id
 
+
 class UserUpdatedDetails:
     def __init__(self, _id, fullname, address, town, phone, email, gender, dob):
         self._id = _id
@@ -151,6 +179,7 @@ class UserUpdatedDetails:
 
     def get_dob(self):
         return self.dob
+
 
 class Orders:
     def __init__(self, customer_id, contents, total_price, delivery_address, date_created, instructions=None,

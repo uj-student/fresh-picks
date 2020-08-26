@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import FreshPicksUtilities
 import FreshPicksUtilities as util
 import databaseManager as db
-from FreshPicksObjects import User, UserUpdatedDetails, Orders, ProductObject
+from FreshPicksObjects import User, UserUpdatedDetails, Orders, ProductObject, AdminUser
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -84,6 +84,24 @@ def login():
 
     return render_template('login.html', feedback=error)
 
+@app.route('/admin', methods=['GET', "POST"])
+def admin():
+    error = ""
+    if request.method == 'POST':
+        req = request.form
+
+        user_profile = db.get_user_profile(req['phone-number'])
+        if user_profile is None:
+            error = "Account could not be found. Have you registered?"
+        else:
+            user_profile = FreshPicksUtilities.convert_db_result_to_user(user_profile)
+            if not check_password_hash(user_profile.get_user_password(), req['enter-password']):
+                error = "Incorrect Password"
+
+        if not error:
+            setupUserSession(user_profile)
+            return redirect(url_for('products'))
+    return render_template('/admin/admin_login.html', feedback=error)
 
 def setupUserSession(user_profile):
     session.clear()
@@ -365,6 +383,49 @@ def add_product():
         db.add_product(new_product)
         return redirect(url_for('add_product'))
     return render_template('admin/add_products.html')
+
+
+@app.route('/admin/users/add', methods=['POST', 'GET'])
+def add_admin_user():
+    if request.method == "POST":
+        req = request.form
+
+        if len(req['username']) < 6:
+            flash("Username must be at least 6 characters long. Please try again.", "alert-warning")
+            # return redirect(url_for("add_admin_user"))
+            return render_template('admin/admin_register.html')
+
+        if len(req['password']) < 10:
+            flash("Password must be at least 10 characters. Please choose a strong password.", "alert-danger")
+            # return render_template('admin/admin_register.html')
+            return redirect(url_for("add_admin_user"))
+
+        if req['password'] != req['confirm-password']:
+            flash("Ensure that passwords are the same. Please try again.", "alert-danger")
+            return render_template('admin/admin_register.html')
+
+        if len(req['phone-number']) < 7:
+            flash("Phone number may be short a few digits", "alert-warning")
+
+        admin_account = AdminUser(
+            name=req['fullname'],
+            email=req['email-address'],
+            cellphone=str(req['phone-number']).replace(" ", ""),
+            password=generate_password_hash(req['password']),
+            username=req['username']
+        )
+
+        try:
+            db.add_admin_user(admin_account)
+        except Exception as error:
+            flash(f"Could not create account. \nReason: {error}", "alert-danger")
+            traceback.print_exc()
+            return redirect(url_for("add_admin_user"))
+
+        flash(f"{admin_account.get_username()}'s account has been created successfully!", "alert-success")
+
+        return redirect(url_for("add_admin_user"))
+    return render_template('admin/admin_register.html')
 
 
 def upload_picture(uploaded_picture):
