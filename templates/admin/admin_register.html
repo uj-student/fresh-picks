@@ -1,0 +1,82 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Admin Login{% endblock %}
+{% block content %}
+
+    <section class="ftco-section">
+        {% block main %}
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xl-7 ftco-animate">
+                        <form action="{{ url_for('add_admin_user') }}" method="post" class="billing-form">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    <ul class="flash">
+                                    {% for category, message in messages %}
+                                        <p class="{{ category }}">{{ message }}</p>
+                                    {% endfor %}
+                                    </ul>
+
+                                {% endif %}
+                            {% endwith %}
+                            <h3 class="mb-4 billing-heading">Register User</h3>
+                            <div class="row align-items-end">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="fullname">Full Name</label>
+                                        <input type="text" class="form-control" name="fullname" required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="username">Username</label>
+                                        <input type="text" class="form-control" name="username" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email-address">Email Address</label>
+                                        <input type="text" class="form-control" name="email-address" required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="phone-number">Phone Number</label>
+                                        <input type="number" class="form-control" name="phone-number" placeholder="+260"
+                                               required>
+                                    </div>
+                                </div>
+
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="password">Enter Password</label>
+                                        <input type="password" class="form-control" name="password" required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="confirm-password">Confirm Password</label>
+                                        <input type="password" class="form-control" name="confirm-password" required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+
+                            </div>
+                            <div>
+                                <button type="submit" class="col-md-12 btn btn-primary py-3 px-4">Create User</button>
+                            </div>
+
+                        </form><!-- END -->
+                    </div>
+                </div>
+            </div>
+
+        {% endblock %}
+    </section> <!-- .section -->
+
+
+{% endblock %}

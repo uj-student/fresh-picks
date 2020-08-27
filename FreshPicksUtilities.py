@@ -38,6 +38,17 @@ def convert_db_result_to_user(database_record):
     )
 
 
+def convert_db_result_to_admin(database_record):
+    return my_objects.AdminUser(
+        admin_id=database_record[0],
+        name=database_record[1],
+        username=database_record[2],
+        email=database_record[3],
+        cellphone=database_record[4],
+        date_created=database_record[5]
+    )
+
+
 def convert_to_order():
     # TODO
     pass

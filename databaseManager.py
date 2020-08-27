@@ -77,6 +77,40 @@ def get_user_profile(user_phone):
     return user_account
 
 
+def get_admin_account(username):
+    conn = get_connection()
+    account = ""
+    try:
+        query = "select * from admin_users where username = ?"
+        cursor = conn.cursor()
+        account = cursor.execute(query, (username,)).fetchone()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+    return account
+
+def get_all_admins():
+    conn = get_connection()
+    accounts = ""
+    try:
+        query = "select id, name, username, email_address, cellphone_number, created from admin_users;"
+        cursor = conn.cursor()
+        accounts = cursor.execute(query).fetchall()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+    return accounts
+
+
 def get_all_customers():
     conn = get_connection()
     user_account_list = ""

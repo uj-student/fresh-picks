@@ -34,12 +34,14 @@ class ProductObject:
 
 
 class AdminUser:
-    def __init__(self, username, password, cellphone, name, email):
+    def __init__(self, username, cellphone, name, email, date_created, admin_id=0, password=0):
+        self.admin_id = admin_id
         self.username = username
         self.password = password
         self.cellphone = cellphone
         self.name = name
         self.email = email
+        self.date_created = date_created
 
     def get_username(self):
         return self.username
@@ -55,6 +57,12 @@ class AdminUser:
 
     def get_email(self):
         return self.email
+
+    def get_admin_id(self):
+        return self.admin_id
+
+    def get_date_created(self):
+        return self.date_created
 
 
 class User:
