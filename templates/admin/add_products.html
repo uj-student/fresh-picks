@@ -1,0 +1,83 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Add Product{% endblock %}
+{% block content %}
+
+
+    <section class="ftco-section">
+        {% block main %}
+
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-xl-7 ftco-animate">
+                        <form action="/admin/products/add" method="post" class="billing-form"
+                              enctype="multipart/form-data">
+                            <h3 class="mb-4 billing-heading">Add Product</h3>
+                            <div class="row align-items-end">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="full-name">Display Name</label>
+                                        <input type="text" class="form-control" name="product-name"
+                                               placeholder="Must be unique" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="home-address">Description</label>
+                                        <input type="text" class="form-control" name="product-description"
+                                               placeholder="Items in the basket">
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="town-city">Price</label>
+                                        <input type="text" class="form-control" name="price" placeholder="ZK00.00"
+                                               required>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="type">Product Type</label>
+                                        <div class="select-wrap">
+                                            <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                            <select name="type" class="form-control">
+                                                <option value="basket">Basket</option>
+                                                <option value="extra">Extra</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="display-image">Upload Display Image</label><br>
+                                        <input type="file" name="display-image" class="form-control-file col-md-6"
+                                               required>
+                                    </div>
+                                </div>
+
+                                {% if feedback %}
+                                    <p class="alert-danger float-xl-none">{{ feedback }}</p>
+                                {% endif %}
+                                <div class="w-100"></div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                    <label for="display">Show to customers?</label><br>
+                                    <input type="radio" name="display" value="yes">Yes
+                                    <input type="radio" name="display" value="no">No
+                                </div>
+                            </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="col-md-12 btn btn-primary py-3 px-4">Submit</button>
+                    </div>
+                    </form><!-- END -->
+                </div>
+            </div>
+            </div>
+
+        {% endblock %}
+    </section> <!-- .section -->
+
+{% endblock %}

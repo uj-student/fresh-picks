@@ -77,6 +77,40 @@ def get_user_profile(user_phone):
     return user_account
 
 
+def get_admin_account(username):
+    conn = get_connection()
+    account = ""
+    try:
+        query = "select * from admin_users where username = ?"
+        cursor = conn.cursor()
+        account = cursor.execute(query, (username,)).fetchone()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+    return account
+
+def get_all_admins():
+    conn = get_connection()
+    accounts = ""
+    try:
+        query = "select id, name, username, email_address, cellphone_number, created from admin_users;"
+        cursor = conn.cursor()
+        accounts = cursor.execute(query).fetchall()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+    return accounts
+
+
 def get_all_customers():
     conn = get_connection()
     user_account_list = ""
@@ -242,6 +276,40 @@ def change_product_display(display, product_id):
         query = "update products set is_displayed = ? where id = ?;"
         cursor = conn.cursor()
         cursor.execute(query, (display, product_id))
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+def add_product(new_product):
+    conn = get_connection()
+    try:
+        query = "insert into products (name, description, price, image_location, is_main, is_displayed)  values " \
+                "(:name, :description, :price, :image_location, :is_main, :isdisplayed);"
+        cursor = conn.cursor()
+        cursor.execute(query, (new_product.get_product_name(), new_product.get_product_description(), new_product.get_product_price(),
+                               new_product.get_product_image(), new_product.get_is_main(), new_product.get_is_display()))
+        conn.commit()
+        cursor.close()
+    except sqlite3.Error as error:
+        traceback.print_exc()
+        print(f'Failed to add user: \nProblem -> {error}')
+        raise Exception(error)
+    finally:
+        close_connection(conn)
+
+def add_admin_user(new_admin):
+    conn = get_connection()
+    try:
+        query = "insert into admin_users (username, password, cellphone_number, name, email_address) values " \
+                "(:username, :password, :cellphone_number, :name, :email_address);"
+        cursor = conn.cursor()
+        cursor.execute(query, (new_admin.get_username(), new_admin.get_password(), new_admin.get_cellphone(), new_admin.get_name(),
+                               new_admin.get_email()))
         conn.commit()
         cursor.close()
     except sqlite3.Error as error:

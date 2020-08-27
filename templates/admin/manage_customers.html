@@ -7,6 +7,17 @@
             <div class="row">
                 <div class="col-md-12 ftco-animate">
                     <div class="cart-list">
+
+                        <div>
+                            <form action="{{ url_for('admin_view', view='admin_users') }}">
+                                <select class="dropdown-toggle" name="_manage_users"
+                                        data-toggle="dropdown" aria-haspopup="true"
+                                        onchange="this.form.submit()">
+                                    <option selected disabled value="current">Customers</option>
+                                    <option value="admin_users">Admin Users</option>
+                                </select>
+                            </form>
+                        </div>
                         <table class="table">
                             <thead class="thead-primary">
                             <tr class="text-center">
@@ -27,8 +38,6 @@
                                         <form action="/mark_complete" method="post">
                                             <td class="total">
                                                 <h6>{{ customer.get_user_id() }}</h6>
-{#                                                <input type="text" name="_order_id" value="{{ order.get_order_id() }}"#}
-{#                                                       hidden>#}
                                             </td>
 
                                             <td class="product-name">
@@ -36,7 +45,7 @@
                                             </td>
 
                                             <td class="product-name">
-                                                    <h6>{{ customer.get_full_address() }}</h6>
+                                                <h6>{{ customer.get_full_address() }}</h6>
                                             </td>
 
                                             <td class="product-name">
@@ -44,7 +53,7 @@
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_user_gender()}}</h6>
+                                                <h6>{{ customer.get_user_gender() }}</h6>
                                             </td>
 
                                             <td class="product-name">
@@ -54,21 +63,6 @@
                                             <td class="product-name">
                                                 <h6>{{ customer.get_user_email_address() }}</h6>
                                             </td>
-
-{#                                            <td class="product-name">#}
-{#                                                <select class="dropdown-toggle" name="_order_status"#}
-{#                                                        data-toggle="dropdown" aria-haspopup="true"#}
-{#                                                        onchange="this.form.submit()">#}
-{#                                                    <option selected disabled hidden#}
-{#                                                            value="current">{{ order.get_status() }}</option>#}
-{#                                                    <option value="pending">Pending</option>#}
-{#                                                    <option value="cancel">Cancel</option>#}
-{#                                                    <option value="complete">Complete</option>#}
-{#                                                </select>#}
-{#                                                <input type="text" name="_current_status"#}
-{#                                                       value="{{ order.get_status() }}"#}
-{#                                                       hidden>#}
-{#                                            </td>#}
                                         </form>
                                     </tr><!-- END TR-->
                                 {% endfor %}

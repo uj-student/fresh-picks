@@ -1,6 +1,5 @@
-{% extends 'base_template.html' %}
-{% block title %} FreshPicks - Login {% endblock %}
-{% block navbar %} FreshPicks {% endblock %}
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Admin Login{% endblock %}
 {% block content %}
 
 
@@ -10,20 +9,20 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-xl-7 ftco-animate">
-                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        <h3 class="mb-4 billing-heading">Admin</h3>
+                        <form action="/admin" method="post" class="billing-form">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
                                 {% if messages %}
                                     {% for category, message in messages %}
                                         <p class="{{ category }}">{{ message }}</p>
                                     {% endfor %}
                                 {% endif %}
                             {% endwith %}
-                        <form action="/login" method="post" class="billing-form">
-                            <h3 class="mb-4 billing-heading">Login!</h3>
                             <div class="row align-items-end">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="phone-number">Phone Number</label>
-                                        <input type="text" name="phone-number" class="form-control" placeholder="+260"
+                                        <label for="user-name">Username</label>
+                                        <input type="text" name="user-name" class="form-control"
                                                required>
                                     </div>
                                 </div>
@@ -33,9 +32,8 @@
                                 <div class="w-100"></div>
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="enter-password">Enter Password</label>
-                                        <input type="password" name="enter-password" class="form-control"
-                                               placeholder="Password" required>
+                                        <label for="enter-password">Password</label>
+                                        <input type="password" name="enter-password" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="w-100"></div>
@@ -48,7 +46,8 @@
                         <div class="w-100"></div>
                         <br>
                         <div>
-                            <button type="submit" class="col-md-12 btn btn-outline-secondary py-3 px-4">Reset Password</button>
+                            <button type="submit" class="col-md-12 btn btn-outline-secondary py-3 px-4">Reset Password
+                            </button>
                         </div>
 
                     </div>

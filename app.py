@@ -1,12 +1,15 @@
+import os
+import time
 import traceback
 
+from PIL import Image
 from flask import Flask, g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import FreshPicksUtilities
 import FreshPicksUtilities as util
 import databaseManager as db
-from FreshPicksObjects import User, UserUpdatedDetails, Orders
+from FreshPicksObjects import User, UserUpdatedDetails, Orders, ProductObject, AdminUser
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
@@ -28,20 +31,22 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/shop')
-def shop():
-    return render_template('shop.html')
+# @app.route('/shop')
+# def shop():
+#     return render_template('shop.html')
 
 
 @app.route('/cart')
 def cart():
+    if not g.user:
+        return redirect(url_for('login'))
     return render_template('cart.html')
 
 
 @app.route('/products')
 def products():
     product_list = db.get_products()
-    basket_list, extra_list = util.convert_to_Product(product_list)
+    basket_list, extra_list = util.convert_db_result_to_product(product_list)
     basket_display_list = []
     for basket in basket_list:
         if basket.get_is_display() == 1:
@@ -56,9 +61,21 @@ def products():
 @app.before_request
 def before_request():
     g.user = None
+    g.admin = None
 
     if 'user_name' in session:
         g.user = session['user_name']
+    elif 'admin_username' in session:
+        g.admin = session['admin_username']
+
+
+def is_customer_logged_in():
+    if not g.user:
+        return redirect(url_for('login'))
+
+def is_admin_logged_in():
+    if not g.admin:
+        return redirect(url_for('admin'))
 
 
 @app.route('/login', methods=['GET', "POST"])
@@ -71,7 +88,7 @@ def login():
         if user_profile is None:
             error = "Account could not be found. Have you registered?"
         else:
-            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_db_result_to_user(user_profile)
             if not check_password_hash(user_profile.get_user_password(), req['enter-password']):
                 error = "Incorrect Password"
 
@@ -80,6 +97,30 @@ def login():
             return redirect(url_for('products'))
 
     return render_template('login.html', feedback=error)
+
+
+@app.route('/admin', methods=['GET', "POST"])
+def admin():
+    error = ""
+    if g.admin:
+        return redirect(url_for('admin_view', view='all_orders'))
+    if request.method == 'POST':
+        req = request.form
+
+        user_profile = db.get_admin_account(req['user-name'])
+        if user_profile is None:
+            flash("Account could not be found. Please contact Admin.", "alert-danger")
+            return render_template('/admin/admin_login.html')
+        else:
+            user_session = FreshPicksUtilities.convert_db_result_to_admin(user_profile)
+            if not check_password_hash(user_profile[2], req['enter-password']):
+                flash("Incorrect Password", "alert-danger")
+                return render_template('/admin/admin_login.html')
+
+        if not error:
+            setupAdminSession(user_session)
+            return redirect(url_for('admin_view', view='all_orders'))
+    return render_template('/admin/admin_login.html')
 
 
 def setupUserSession(user_profile):
@@ -93,6 +134,12 @@ def setupUserSession(user_profile):
     session['user_email'] = user_profile.get_user_email_address()
     session['user_gender'] = user_profile.get_user_gender()
     session['user_dob'] = user_profile.get_user_birthday()
+
+
+def setupAdminSession(adminUser):
+    session.clear()
+    session['admin_username'] = adminUser.get_username()
+    session['name'] = adminUser.get_name()
 
 
 @app.route('/sign-up', methods=['GET', 'POST'])
@@ -131,15 +178,20 @@ def signup():
     return render_template('sign-up.html')
 
 
-@app.route('/checkout')
-def checkout():
-    return render_template('checkout.html')
+# @app.route('/checkout')
+# def checkout():
+#     return render_template('checkout.html')
 
 
 @app.route('/logout')
 def logout():
+    goto =""
+    if g.user:
+        goto = "home"
+    elif g.admin:
+        goto = "admin"
     session.clear()
-    return redirect(url_for('home'))
+    return redirect(url_for(goto))
 
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -168,7 +220,7 @@ def account():
             db.update_user(old_data=current_user, new_data=new_user)
             flash("Details updated successfully")
             user_profile = db.get_user_by_id(session['user_id'])
-            user_profile = FreshPicksUtilities.convert_to_User(user_profile)
+            user_profile = FreshPicksUtilities.convert_db_result_to_user(user_profile)
             setupUserSession(user_profile)
             return redirect(url_for('account'))
         else:
@@ -182,6 +234,9 @@ def account():
 
 @app.route('/add', methods=['POST'])
 def add_product_to_cart():
+    if not g.user:
+        flash('Please Login to shop.', "alert-warning")
+        return redirect(url_for('login'))
     if request.method == 'POST':
         total_quantity = 0
         total_price = 0
@@ -263,13 +318,15 @@ def clear_cart():
     session['total_price'] = 0
 
 
-@app.route('/wish')
-def wish():
-    return render_template('wishlist.html')
+# @app.route('/wish')
+# def wish():
+#     return render_template('wishlist.html')
 
 
 @app.route('/order', methods=['POST'])
 def process_order():
+    if not g.user:
+        return redirect(url_for('login'))
     if request.method == "POST":
         req = request.form
         if 'my_cart' in session:
@@ -287,16 +344,20 @@ def process_order():
             clear_cart()
     return render_template('cart.html')
 
-#an idea
-my_views ={
+
+# an idea
+my_views = {
     "pending": "pending_orders",
     "complete": "completed_orders",
     "cancel": "cancelled_orders",
     "all": "all_orders"
 }
 
+
 @app.route('/admin/<path:view>')
 def admin_view(view):
+    if not g.admin:
+        return redirect(url_for('admin'))
     orders_list = []
     orders = ""
     if "orders" in view:
@@ -317,11 +378,17 @@ def admin_view(view):
         user_list = db.get_all_customers()
         customer_list = []
         for customer in user_list:
-            customer_list.append(FreshPicksUtilities.convert_to_User(customer))
+            customer_list.append(FreshPicksUtilities.convert_db_result_to_user(customer))
         return render_template('admin/manage_customers.html', customer_list=customer_list)
+    elif view == "admin_users":
+        user_list = db.get_all_admins()
+        admin_list = []
+        for user in user_list:
+            admin_list.append(FreshPicksUtilities.convert_db_result_to_admin(user))
+        return render_template('admin/manage_users.html', admin_list=admin_list)
     elif view == "products":
         product_list = db.get_products()
-        basket_list, extra_list = util.convert_to_Product(product_list)
+        basket_list, extra_list = util.convert_db_result_to_product(product_list)
         basket_list = array_merge(basket_list, extra_list)
         return render_template('admin/manage_products.html', basket_list=basket_list)
     return render_template('admin/manage_products.html', basket_list=[])
@@ -329,6 +396,8 @@ def admin_view(view):
 
 @app.route('/mark_complete', methods=['POST'])
 def mark_complete():
+    if not g.admin:
+        return redirect(url_for('admin'))
     if request.method == 'POST':
         new_status = request.form['_order_status']
         current_status = request.form['_current_status']
@@ -339,9 +408,90 @@ def mark_complete():
 
 @app.route('/admin/remove/<int:product_id>/<int:display>')
 def toggle_product_display(product_id, display):
+    if not g.admin:
+        return redirect(url_for('admin'))
     display = 1 - display
     db.change_product_display(display=display, product_id=product_id)
     return redirect((url_for('admin_view', view="products")))
+
+
+@app.route('/admin/products/add', methods=['POST', 'GET'])
+def add_product():
+    if not g.admin:
+        return redirect(url_for('admin'))
+    if request.method == "POST":
+        req = request.form
+        image_location = upload_picture(request.files['display-image'])
+        new_product = ProductObject(
+            name=req['product-name'],
+            description=req['product-description'],
+            price=req['price'],
+            image="/" + image_location,
+            is_main=0 if req['type'] == "extra" else 1,
+            is_display=1 if req['display'] == "yes" else 0
+        )
+        db.add_product(new_product)
+        return redirect(url_for('add_product'))
+    return render_template('admin/add_products.html')
+
+
+@app.route('/admin/users/add', methods=['POST', 'GET'])
+def add_admin_user():
+    if not g.admin:
+        return redirect(url_for('admin'))
+    if request.method == "POST":
+        req = request.form
+
+        if len(req['username']) < 6:
+            flash("Username must be at least 6 characters long. Please try again.", "alert-warning")
+            # return redirect(url_for("add_admin_user"))
+            return render_template('admin/admin_register.html')
+
+        if len(req['password']) < 10:
+            flash("Password must be at least 10 characters. Please choose a strong password.", "alert-danger")
+            # return render_template('admin/admin_register.html')
+            return redirect(url_for("add_admin_user"))
+
+        if req['password'] != req['confirm-password']:
+            flash("Ensure that passwords are the same. Please try again.", "alert-danger")
+            return render_template('admin/admin_register.html')
+
+        if len(req['phone-number']) < 7:
+            flash("Phone number may be short a few digits", "alert-warning")
+
+        admin_account = AdminUser(
+            name=req['fullname'],
+            email=req['email-address'],
+            cellphone=str(req['phone-number']).replace(" ", ""),
+            password=generate_password_hash(req['password']),
+            username=req['username'],
+            date_created=0
+        )
+
+        try:
+            db.add_admin_user(admin_account)
+        except Exception as error:
+            flash(f"Could not create account. \nReason: {error}", "alert-danger")
+            traceback.print_exc()
+            return redirect(url_for("add_admin_user"))
+
+        flash(f"{admin_account.get_username()}'s account has been created successfully!", "alert-success")
+
+        return redirect(url_for("add_admin_user"))
+    return render_template('admin/admin_register.html')
+
+
+def upload_picture(uploaded_picture):
+    f_name, f_ext = os.path.splitext(uploaded_picture.filename)
+    image_name = f_name + str(round(time.time())) + f_ext
+    # image_path = os.path.join(app.root_path, 'static/images', image_name)
+    image_path = 'static/images/' + image_name
+    resize = (300, 300)
+    resize_image = Image.open(uploaded_picture)
+    resize_image.thumbnail(resize)
+    resize_image.save(image_path)
+    return image_path
+
 
 if __name__ == '__main__':
     app.run(debug=True)
