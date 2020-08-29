@@ -5,14 +5,18 @@ import traceback
 from PIL import Image
 from flask import Flask, g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 
 import FreshPicksUtilities
 import FreshPicksUtilities as util
-import databaseManager as db
+# import databaseManager as db
 from FreshPicksObjects import User, UserUpdatedDetails, Orders, ProductObject, AdminUser
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///FreshPicks.db'
+
+db = SQLAlchemy(app)
 
 
 @app.route('/')
