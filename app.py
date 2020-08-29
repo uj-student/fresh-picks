@@ -494,8 +494,8 @@ def upload_picture(uploaded_picture):
 
 
 @app.route('/reset_password', methods=['POST', 'GET'])
-def customer_password_reset(user_id=0):
-    if request.method == 'POSTS':
+def customer_password_reset():
+    if request.method == 'POST':
         req = request.form
         phone_number = req['phone-number']
         new_password = req['new-password']
@@ -503,7 +503,7 @@ def customer_password_reset(user_id=0):
         user_profile = db.get_user_profile(phone_number)
         password = ""
 
-        if not user_profile[9]:
+        if user_profile and not user_profile[9]:
             if len(new_password) > 9 and new_password == confirm_password:
                 password = generate_password_hash(new_password)
             else:
