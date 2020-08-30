@@ -6,8 +6,8 @@ from flask import g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from freshpicks import databaseManager as my_db, FreshPicksUtilities, app, db
-from freshpicks.FreshPicksObjects import UserUpdatedDetails, Orders
-from freshpicks.databaseModels import Customers, AdminUsers, Products
+from freshpicks.FreshPicksObjects import UserUpdatedDetails
+from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders
 
 # print("Hello")
 print(Customers.query.all())
@@ -496,18 +496,6 @@ def add_admin_user():
 
         return redirect(url_for("add_admin_user"))
     return render_template('admin/admin_register.html')
-
-
-def upload_picture(uploaded_picture):
-    f_name, f_ext = os.path.splitext(uploaded_picture.filename)
-    image_name = f_name + str(round(time.time())) + f_ext
-    # image_path = os.path.join(app.root_path, 'static/images', image_name)
-    image_path = 'static/images/' + image_name
-    resize = (300, 300)
-    resize_image = Image.open(uploaded_picture)
-    resize_image.thumbnail(resize)
-    resize_image.save(image_path)
-    return image_path
 
 
 @app.route('/reset_password', methods=['POST', 'GET'])
