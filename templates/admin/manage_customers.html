@@ -29,6 +29,7 @@
                                 <th>Birthday</th>
                                 <th>Email</th>
                                 <th>Created</th>
+                                <th> </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -62,6 +63,14 @@
 
                                             <td class="product-name">
                                                 <h6>{{ customer.get_user_email_address() }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+{#                                                <a href="{{ url_for('toggle_product_display', product_id=item.get_product_id(),#}
+{#                                            display=item.get_is_display()) }}" class="alert-link">#}
+                                                        <h6>{{ "Reset Password" }}</h6>
+                                                        <span class="ion-ios-refresh"></span>
+{#                                                </a>#}
                                             </td>
                                         </form>
                                     </tr><!-- END TR-->
