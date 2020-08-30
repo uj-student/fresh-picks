@@ -11,6 +11,13 @@
                     <div class="col-xl-7 ftco-animate">
                         <form action="/admin/products/add" method="post" class="billing-form"
                               enctype="multipart/form-data">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <p class="{{ category }}">{{ message }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
                             <h3 class="mb-4 billing-heading">Add Product</h3>
                             <div class="row align-items-end">
                                 <div class="col-md-12">

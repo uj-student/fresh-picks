@@ -50,8 +50,8 @@ class Products(db.Model):
     is_displayed = db.Column(db.Boolean(), default=False, nullable=False)
 
     def __repr__(self):
-        return self
-
+        return f"Product('{self.id}', '{self.name}', '{self.description}', '{self.price}', '{self.image_location}', " \
+               f"'{self.is_basket_item}', {self.is_displayed})"
 
 class AdminUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
@@ -59,8 +59,9 @@ class AdminUsers(db.Model):
     password = db.Column(db.String(), nullable=False)
     cellphone_number = db.Column(db.String(), nullable=False, unique=True)
     name = db.Column(db.String(), nullable=False, unique=True)
-    date_created = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
     email_address = db.Column(db.String(), unique=True, nullable=False)
+    date_created = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
 
     def __repr__(self):
-        return self
+        return f"Admin('{self.id}', '{self.username}', '{self.cellphone_number}', '{self.name}', '{self.email_address}', " \
+               f"'{self.date_created}')"
