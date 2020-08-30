@@ -11,7 +11,9 @@ from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders
 
 # db.create_all()
 # print("Hello")
-# print(Customers.query.all())
+lst = Customers.query.all()
+print(lst)
+print(len(lst))
 
 
 @app.route('/')
@@ -197,24 +199,25 @@ def account():
         phone = req['phone-number']
         email = req['email-address']
 
-        user_profile = Customers.query.filter_by(id=session['user_id'])
+        user_profile = Customers.query.filter_by(id=session['user_id']).first()
 
         if phone != session['user_phone']:
-            check_for_number = Customers.query.filter_by(phone_number=phone)
+            check_for_number = Customers.query.filter_by(phone_number=phone).all()
+            if len(check_for_number) < 1:
+                user_profile.phone_number = phone
+            else:
+                flash("Phone Number already in use.", "alert-info")
+                return redirect(url_for('account'))
         if email or email != session['user_email']:
-            check_for_email = Customers.query.filter_by(email_address=email)
-        if len(check_for_number) < 1:
-            user_profile.phone_number = phone
-        else:
-            flash("Phone Number already in use.", "alert-info")
-            return redirect(url_for('account'))
-        if len(check_for_email) < 1:
-            user_profile.email_address = email
-        else:
-            flash("Email address already in use.", "alert-info")
-            return redirect(url_for('account'))
+            check_for_email = Customers.query.filter_by(email_address=email).all()
+            if len(check_for_email) < 1:
+                user_profile.email_address = email
+            else:
+                flash("Email address already in use.", "alert-info")
+                return redirect(url_for('account'))
+
         if req['full-name'] != session['user_name']:
-            user_profile.fullname = req['fullname']
+            user_profile.fullname = req['full-name']
         if req['home-address'] != session['user_address']:
             user_profile.address = req['home-address']
         if req['town-city'] != session['user_town']:
@@ -224,7 +227,7 @@ def account():
         if req['dob'] != session['user_dob']:
             user_profile.dob = req['dob']
         db.session.commit()
-        user_profile = Customers.query.filter_by(id=session['user_id'])
+        user_profile = Customers.query.filter_by(id=session['user_id']).first()
         setupUserSession(user_profile)
         flash("Details updated successfully", "alert-info")
         return redirect(url_for('account'))
