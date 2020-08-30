@@ -441,6 +441,17 @@ def add_product():
         return redirect(url_for('add_product'))
     return render_template('admin/add_products.html')
 
+def upload_picture(uploaded_picture):
+    f_name, f_ext = os.path.splitext(uploaded_picture.filename)
+    image_name = f_name + str(round(time.time())) + f_ext
+    # image_path = os.path.join(app.root_path, 'static/images', image_name)
+    image_path = 'static/images/' + image_name
+    resize = (300, 300)
+    resize_image = Image.open(uploaded_picture)
+    resize_image.thumbnail(resize)
+    resize_image.save(image_path)
+    return image_path
+
 
 @app.route('/admin/users/add', methods=['POST', 'GET'])
 def add_admin_user():
@@ -487,13 +498,25 @@ def add_admin_user():
     return render_template('admin/admin_register.html')
 
 
-def upload_picture(uploaded_picture):
-    f_name, f_ext = os.path.splitext(uploaded_picture.filename)
-    image_name = f_name + str(round(time.time())) + f_ext
-    # image_path = os.path.join(app.root_path, 'static/images', image_name)
-    image_path = 'static/images/' + image_name
-    resize = (300, 300)
-    resize_image = Image.open(uploaded_picture)
-    resize_image.thumbnail(resize)
-    resize_image.save(image_path)
-    return image_path
+@app.route('/reset_password', methods=['POST', 'GET'])
+def customer_password_reset():
+    if request.method == 'POST':
+        req = request.form
+        phone_number = req['phone-number']
+        new_password = req['new-password']
+        confirm_password = req['confirm-password']
+        user_profile = db.get_user_profile(phone_number)
+        password = ""
+
+        if user_profile and not user_profile[9]:
+            if len(new_password) > 9 and new_password == confirm_password:
+                password = generate_password_hash(new_password)
+            else:
+                flash("Passwords must be at least 10 characters and match. Please choose a strong password.", "alert-danger")
+                return redirect(url_for("customer_password_reset"))
+        else:
+            flash("Cannot reset password at the moment. Please contact us for help.", "alert-danger")
+            return redirect(url_for("customer_password_reset"))
+        return redirect(url_for("customer_password_reset"))
+
+    return  render_template('password_reset.html')
