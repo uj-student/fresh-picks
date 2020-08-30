@@ -10,10 +10,10 @@
                 <div class="row justify-content-center">
                     <div class="col-xl-7 ftco-animate">
                         <form action="/account" method="post" class="billing-form">
-                            {% with messages = get_flashed_messages() %}
+                            {% with messages = get_flashed_messages(with_categories=true) %}
                                 {% if messages %}
-                                    {% for msg in messages %}
-                                        <p>{{ msg }}</p>
+                                    {% for category, message in messages %}
+                                        <p class="{{ category }}">{{ message }}</p>
                                     {% endfor %}
                                 {% endif %}
                             {% endwith %}

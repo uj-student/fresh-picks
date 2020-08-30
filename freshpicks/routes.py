@@ -6,10 +6,10 @@ from flask import g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from freshpicks import databaseManager as my_db, FreshPicksUtilities, app, db
-from freshpicks.FreshPicksObjects import UserUpdatedDetails
 from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders
 
 
+# db.create_all()
 # print("Hello")
 # print(Customers.query.all())
 
@@ -191,36 +191,43 @@ def account():
     if not g.user:
         return redirect(url_for('login'))
     if request.method == "POST":
+        check_for_number = ""
+        check_for_email = ""
         req = request.form
         phone = req['phone-number']
         email = req['email-address']
 
-        current_user = UserUpdatedDetails(session['user_id'], session['user_name'], session['user_address'],
-                                          session['user_town'], session['user_phone'], session['user_email'],
-                                          session['user_gender'], session['user_dob'])
+        user_profile = Customers.query.filter_by(id=session['user_id'])
 
-        new_user = UserUpdatedDetails("#", req['full-name'], req['home-address'], req['town-city'],
-                                      req['phone-number'], req['email-address'], req['gender'], req['dob'])
-
-        is_unique = my_db.is_unique(phone, email)
-        if session['user_phone'] == phone and session['user_email'] == email and (
-                req['full-name'] != session['user_name']
-                or req['home-address'] != session['user_address']
-                or req['town-city'] != session['user_town']
-                or req['gender'] != session['user_gender']
-                or req['dob'] != session['user_dob']):
-            my_db.update_user(old_data=current_user, new_data=new_user)
-            flash("Details updated successfully")
-            user_profile = my_db.get_user_by_id(session['user_id'])
-            user_profile = FreshPicksUtilities.convert_db_result_to_user(user_profile)
-            setupUserSession(user_profile)
-            return redirect(url_for('account'))
+        if phone != session['user_phone']:
+            check_for_number = Customers.query.filter_by(phone_number=phone)
+        if email or email != session['user_email']:
+            check_for_email = Customers.query.filter_by(email_address=email)
+        if len(check_for_number) < 1:
+            user_profile.phone_number = phone
         else:
-            if is_unique:
-                flash("Phone Number or email already in use.", "alert-info")
-                return redirect(url_for('account'))
-            elif phone != session['user_phone'] or email != session['user_email']:
-                my_db.update_user(old_data=current_user, new_data=new_user)
+            flash("Phone Number already in use.", "alert-info")
+            return redirect(url_for('account'))
+        if len(check_for_email) < 1:
+            user_profile.email_address = email
+        else:
+            flash("Email address already in use.", "alert-info")
+            return redirect(url_for('account'))
+        if req['full-name'] != session['user_name']:
+            user_profile.fullname = req['fullname']
+        if req['home-address'] != session['user_address']:
+            user_profile.address = req['home-address']
+        if req['town-city'] != session['user_town']:
+            user_profile.town = req['town-city']
+        if req['gender'] != session['user_gender']:
+            user_profile.gender = req['gender']
+        if req['dob'] != session['user_dob']:
+            user_profile.dob = req['dob']
+        db.session.commit()
+        user_profile = Customers.query.filter_by(id=session['user_id'])
+        setupUserSession(user_profile)
+        flash("Details updated successfully", "alert-info")
+        return redirect(url_for('account'))
     return render_template('account.html')
 
 
