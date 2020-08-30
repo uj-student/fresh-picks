@@ -37,31 +37,35 @@
                                     <tr class="text-center">
                                         <form action="/mark_complete" method="post">
                                             <td class="total">
-                                                <h6>{{ customer.get_user_id() }}</h6>
+                                                <h6>{{ customer.id }}</h6>
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_user_name() }}</h6>
+                                                <h6>{{ customer.fullname }}</h6>
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_full_address() }}</h6>
+                                                <h6>{{ customer.address }}</h6>
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_user_phone_number() }}</h6>
+                                                <h6>{{ customer.phone_number }}</h6>
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_user_gender() }}</h6>
+                                                <h6>{{ customer.gender }}</h6>
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_user_birthday() }}</h6>
+                                                <h6>{{ customer.dob }}</h6>
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.get_user_email_address() }}</h6>
+                                                <h6>{{ customer.email_address }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.date_registered }}</h6>
                                             </td>
                                         </form>
                                     </tr><!-- END TR-->

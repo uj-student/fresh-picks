@@ -47,8 +47,8 @@
                                         </td>
 
                                         <td class="product-category">
-                                            <a href="{{ url_for('toggle_product_display', product_id=item.id,
-                                            display=item.is_displayed) }}" class="alert-link">
+                                            <a href="{{ url_for('toggle_product_display', product_id=item.id) }}"
+                                               class="alert-link">
                                                 {% if  item.is_displayed %}
                                                     <h6>{{ "Yes" }}</h6>
                                                     <span class="ion-ios-checkmark-circle-outline"></span>

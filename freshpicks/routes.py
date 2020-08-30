@@ -9,8 +9,8 @@ from freshpicks import databaseManager as my_db, FreshPicksUtilities, app, db
 from freshpicks.FreshPicksObjects import UserUpdatedDetails, Orders
 from freshpicks.databaseModels import Customers, AdminUsers, Products
 
-print("Hello")
-print(Products.query.all())
+# print("Hello")
+print(Customers.query.all())
 
 
 @app.route('/')
@@ -148,9 +148,6 @@ def signup():
         if req['password'] != req['confirm-password']:
             feedback = "Password must be the same. Please try again."
             return render_template('sign-up.html', feedback=feedback)
-
-        print("sign-up")
-        print(type(req['email-address']))
 
         customer = Customers(fullname=req['full-name'],
                              address=req['home-address'],
@@ -378,23 +375,13 @@ def admin_view(view):
                        status=order[5], date_created=order[6], order_id=order[0]))
         return render_template('admin/manage_orders.html', orders_list=orders_list)
     elif view == "customers":
-        user_list = my_db.get_all_customers()
-        customer_list = []
-        for customer in user_list:
-            customer_list.append(FreshPicksUtilities.convert_db_result_to_user(customer))
+        customer_list = Customers.query.all()
         return render_template('admin/manage_customers.html', customer_list=customer_list)
     elif view == "admin_users":
-        user_list = my_db.get_all_admins()
-        admin_list = []
-        for user in user_list:
-            admin_list.append(FreshPicksUtilities.convert_db_result_to_admin(user))
+        admin_list = AdminUsers.query.all()
         return render_template('admin/manage_users.html', admin_list=admin_list)
     elif view == "products":
         product_list = Products.query.all()
-        print(product_list)
-        # basket_list = Products.query.all()
-        # extra_list = FreshPicksUtilities.convert_db_result_to_product(product_list)
-        # basket_list = array_merge(basket_list, extra_list)
         return render_template('admin/manage_products.html', product_list=product_list)
     return render_template('admin/manage_products.html', product_list=[])
 
@@ -411,14 +398,20 @@ def mark_complete():
     return redirect(url_for('admin_view', view="pending_orders"))
 
 
-@app.route('/admin/remove/<int:product_id>/<int:display>')
-def toggle_product_display(product_id, display):
+@app.route('/admin/remove/<int:product_id>')
+def toggle_product_display(product_id):
     if not g.admin:
         return redirect(url_for('admin'))
 
+    product = Products.query.filter_by(id=product_id).first()
+    display_status = product.is_displayed
 
-    display = 1 - display
-    my_db.change_product_display(display=display, product_id=product_id)
+    if display_status:
+        product.is_displayed = False
+    else:
+        product.is_displayed = True
+
+    db.session.commit()
     return redirect((url_for('admin_view', view="products")))
 
 
@@ -444,7 +437,6 @@ def add_product():
             flash(f"Could not add product. \nReason: {error}", "alert-danger")
             return redirect(url_for("add_product"))
 
-        # my_db.add_product(new_product)
         flash(f"{new_product.name} added successfully.", "alert-success")
         return redirect(url_for('add_product'))
     return render_template('admin/add_products.html')
@@ -499,9 +491,7 @@ def upload_picture(uploaded_picture):
     f_name, f_ext = os.path.splitext(uploaded_picture.filename)
     image_name = f_name + str(round(time.time())) + f_ext
     # image_path = os.path.join(app.root_path, 'static/images', image_name)
-    # image_path = 'freshpicks/static/images/' + image_name
     image_path = 'static/images/' + image_name
-    print(image_path)
     resize = (300, 300)
     resize_image = Image.open(uploaded_picture)
     resize_image.thumbnail(resize)
