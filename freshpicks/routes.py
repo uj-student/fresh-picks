@@ -9,8 +9,9 @@ from freshpicks import databaseManager as my_db, FreshPicksUtilities, app, db
 from freshpicks.FreshPicksObjects import UserUpdatedDetails
 from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders
 
+
 # print("Hello")
-print(Customers.query.all())
+# print(Customers.query.all())
 
 
 @app.route('/')
@@ -43,16 +44,15 @@ def cart():
 
 @app.route('/products')
 def products():
-    product_list = my_db.get_products()
-    basket_list, extra_list = FreshPicksUtilities.convert_db_result_to_product(product_list)
+    product_list = Products.query.filter_by(is_displayed=True)
     basket_display_list = []
-    for basket in basket_list:
-        if basket.get_is_display() == 1:
-            basket_display_list.append(basket)
     extras_display_list = []
-    for extra in extra_list:
-        if extra.get_is_display() == 1:
-            extras_display_list.append(extra)
+
+    for item in product_list:
+        if item.is_basket_item:
+            basket_display_list.append(item)
+        else:
+            extras_display_list.append(item)
     return render_template('products.html', baskets=basket_display_list, extras=extras_display_list)
 
 
@@ -108,15 +108,15 @@ def admin():
         user_profile = AdminUsers.query.filter_by(username=req['user-name']).first()
         if user_profile is None:
             flash("Account could not be found. Please contact Admin.", "alert-danger")
-            return render_template('/admin/admin_login.html')
+            return render_template('admin/admin_login.html')
         else:
             if not check_password_hash(user_profile.password, req['enter-password']):
                 flash("Incorrect Password", "alert-danger")
-                return render_template('/admin/admin_login.html')
+                return render_template('admin/admin_login.html')
 
         setupAdminSession(user_profile)
         return redirect(url_for('admin_view', view='all_orders'))
-    return render_template('/admin/admin_login.html')
+    return render_template('admin/admin_login.html')
 
 
 def setupUserSession(user_profile):
@@ -325,21 +325,18 @@ def process_order():
             content = ""
             for k, v in session['my_cart'].items():
                 content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
+
             order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
                 'user_address']
-
-            order_request = Orders(customer_id=session['user_id'], contents=content, total_price=session['total_price'],
-                                   delivery_address=order_address, instructions=req['instructions'])
 
             my_order = Orders(customer_id=session['user_id'],
                               order=content,
                               total_price=session['total_price'],
                               delivery_address=order_address,
                               additional_instructions=req['instructions'])
-            db.session.commit()
 
-            my_db.create_order(order_request)
-            print(f"Contents: {content}\n{order_address}")
+            db.session.add(my_order)
+            db.session.commit()
             flash("Your order has been received.")
             clear_cart()
     return render_template('cart.html')
@@ -358,22 +355,17 @@ my_views = {
 def admin_view(view):
     if not g.admin:
         return redirect(url_for('admin'))
-    orders_list = []
     orders = ""
     if "orders" in view:
         if view == "pending_orders":
-            orders = my_db.get_orders_by_status("pending")
+            orders = Orders.query.filter_by(status="pending")
         elif view == "completed_orders":
-            orders = my_db.get_orders_by_status("complete")
+            orders = Orders.query.filter_by(status="complete")
         elif view == "cancelled_orders":
-            orders = my_db.get_orders_by_status("cancel")
+            orders = Orders.query.filter_by(status="cancel")
         elif view == "all_orders":
-            orders = my_db.get_all_orders()
-        for order in orders:
-            orders_list.append(
-                Orders(customer_id=order[1], contents=order[2], total_price=order[3], delivery_address=order[4],
-                       status=order[5], date_created=order[6], order_id=order[0]))
-        return render_template('admin/manage_orders.html', orders_list=orders_list)
+            orders = Orders.query.all()
+        return render_template('admin/manage_orders.html', orders_list=orders)
     elif view == "customers":
         customer_list = Customers.query.all()
         return render_template('admin/manage_customers.html', customer_list=customer_list)
@@ -441,6 +433,7 @@ def add_product():
         return redirect(url_for('add_product'))
     return render_template('admin/add_products.html')
 
+
 def upload_picture(uploaded_picture):
     f_name, f_ext = os.path.splitext(uploaded_picture.filename)
     image_name = f_name + str(round(time.time())) + f_ext
@@ -502,24 +495,39 @@ def add_admin_user():
 def customer_password_reset():
     if request.method == 'POST':
         req = request.form
-        phone_number = req['phone-number']
+        entered_number = req['phone-number']
         new_password = req['new-password']
         confirm_password = req['confirm-password']
-        user_profile = db.get_user_profile(phone_number)
+
+        user_profile = Customers.query.filter_by(phone_number=entered_number).first()
         password = ""
 
-        if user_profile and not user_profile[9]:
+        if user_profile and not user_profile.password:
             if len(new_password) > 9 and new_password == confirm_password:
-                password = generate_password_hash(new_password)
+                user_profile.password = generate_password_hash(new_password)
+                try:
+                    db.session.commit()
+                except Exception as error:
+                    pass
             else:
-                flash("Passwords must be at least 10 characters and match. Please choose a strong password.", "alert-danger")
+                flash("Passwords must be at least 10 characters and match. Please choose a strong password.",
+                      "alert-danger")
                 return redirect(url_for("customer_password_reset"))
         else:
             flash("Cannot reset password at the moment. Please contact us for help.", "alert-danger")
             return redirect(url_for("customer_password_reset"))
-        return redirect(url_for("customer_password_reset"))
 
-    return  render_template('password_reset.html')
+        flash("Your password has been successfully reset. Use new password to log in", "alert-info")
+        return redirect(url_for("login"))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    return render_template('password_reset.html')
+
+
+@app.route('/reset/<int:customer_id>')
+def password_reset(customer_id):
+    customer = Customers.query.filter_by(id=customer_id).first()
+    customer.password = None
+    db.session.commit()
+    flash(f"{customer.fullname.split(' ')[0]}'s password has been reset. \nPlease inform them to set a new password.",
+          "alert-info")
+    return redirect(url_for('admin_view', view='customers'))

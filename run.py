@@ -1,5 +1,4 @@
-from freshpicks import app, db
-from freshpicks.databaseModels import Customers
+from freshpicks import app
 
 if __name__ == '__main__':
     app.run(debug=True)

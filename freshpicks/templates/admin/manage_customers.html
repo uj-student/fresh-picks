@@ -7,6 +7,13 @@
             <div class="row">
                 <div class="col-md-12 ftco-animate">
                     <div class="cart-list">
+                     {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <p class="{{ category }}">{{ message }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
 
                         <div>
                             <form action="{{ url_for('admin_view', view='admin_users') }}">
@@ -70,11 +77,10 @@
                                             </td>
 
                                             <td class="product-name">
-{#                                                <a href="{{ url_for('toggle_product_display', product_id=item.get_product_id(),#}
-{#                                            display=item.get_is_display()) }}" class="alert-link">#}
+                                                <a href="{{ url_for('password_reset', customer_id=customer.id) }}" class="alert-link">
                                                         <h6>{{ "Reset Password" }}</h6>
                                                         <span class="ion-ios-refresh"></span>
-{#                                                </a>#}
+                                                </a>
                                             </td>
                                         </form>
                                     </tr><!-- END TR-->
