@@ -29,7 +29,7 @@ class Orders(db.Model):
     customer_id = db.Column(db.Integer(), db.ForeignKey('customers.id'), nullable=False)
     order = db.Column(db.String(), nullable=False)
     total_price = db.Column(db.Float(), nullable=False)
-    delivery_address = db.Column(db.String(), unique=True, nullable=False)
+    delivery_address = db.Column(db.String(), nullable=False)
     date_ordered = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
     additional_instructions = db.Column(db.String(), nullable=True)
     status = db.Column(db.String(), nullable=False, default="pending")
@@ -37,7 +37,9 @@ class Orders(db.Model):
     date_cancelled = db.Column(db.TIMESTAMP(), nullable=True)
 
     def __repr__(self):
-        return self
+        return f"Order('{self.id}', '{self.customer_id}', '{self.order}', '{self.total_price}', " \
+               f"'{self.delivery_address}', '{self.date_ordered}', '{self.additional_instructions}', '{self.status}', " \
+               f"'{self.date_completed}', '{self.date_cancelled}')"
 
 
 class Products(db.Model):
@@ -65,3 +67,15 @@ class AdminUsers(db.Model):
     def __repr__(self):
         return f"Admin('{self.id}', '{self.username}', '{self.cellphone_number}', '{self.name}', '{self.email_address}', " \
                f"'{self.date_created}')"
+
+
+class Messages(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    name = db.Column(db.String(), unique=True, nullable=False)
+    phone_number = db.Column(db.String, nullable=False)
+    email_address = db.Column(db.String, nullable=True)
+    subject = db.Column(db.String, nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String, nullable=False, default='open')
+    date_sent = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
+    date_updated = db.Column(db.TIMESTAMP(), nullable=True)

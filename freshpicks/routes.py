@@ -5,13 +5,12 @@ from PIL import Image
 from flask import g, render_template, request, redirect, session, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from freshpicks import databaseManager as my_db, FreshPicksUtilities, app, db
-from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders
-
+from freshpicks import FreshPicksUtilities, app, db
+from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders, Messages
 
 # db.create_all()
 # print("Hello")
-lst = Customers.query.all()
+lst = Orders.query.all()
 print(lst)
 print(len(lst))
 
@@ -81,6 +80,8 @@ def is_admin_logged_in():
 
 @app.route('/login', methods=['GET', "POST"])
 def login():
+    if g.user:
+        return redirect(url_for('home'))
     if request.method == 'POST':
         req = request.form
 
@@ -193,8 +194,6 @@ def account():
     if not g.user:
         return redirect(url_for('login'))
     if request.method == "POST":
-        check_for_number = ""
-        check_for_email = ""
         req = request.form
         phone = req['phone-number']
         email = req['email-address']
@@ -263,7 +262,7 @@ def add_product_to_cart():
                     if k == name:
                         t_quantity = v[1] + 1
                 item_array = {
-                    name: [float(price), int(t_quantity)]
+                    name: [float(price), int(t_quantity), image]
                 }
                 session['my_cart'] = array_merge(session['my_cart'], item_array)
             else:
@@ -325,7 +324,7 @@ def clear_cart():
 #     return render_template('wishlist.html')
 
 
-@app.route('/order', methods=['POST'])
+@app.route('/place_order', methods=['POST'])
 def process_order():
     if not g.user:
         return redirect(url_for('login'))
@@ -334,6 +333,7 @@ def process_order():
         if 'my_cart' in session:
             content = ""
             for k, v in session['my_cart'].items():
+                print(f"Order: {v[0]}")
                 content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
 
             order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
@@ -369,7 +369,7 @@ def admin_view(view):
     if "orders" in view:
         if view == "pending_orders":
             orders = Orders.query.filter_by(status="pending")
-        elif view == "completed_orders":
+        if view == "completed_orders":
             orders = Orders.query.filter_by(status="complete")
         elif view == "cancelled_orders":
             orders = Orders.query.filter_by(status="cancel")
@@ -385,6 +385,9 @@ def admin_view(view):
     elif view == "products":
         product_list = Products.query.all()
         return render_template('admin/manage_products.html', product_list=product_list)
+    elif view == "customer_messages":
+        messages_list = Messages.query.all()
+        return render_template('admin/manage_comments.html', messages_list=messages_list)
     return render_template('admin/manage_products.html', product_list=[])
 
 
@@ -396,7 +399,13 @@ def mark_complete():
         new_status = request.form['_order_status']
         current_status = request.form['_current_status']
         order_id = request.form['_order_id']
-        my_db.update_order_status(new_status=new_status, old_status=current_status, order_id=order_id)
+
+        my_order = Orders.query.filter_by(id=order_id, status=current_status).first()
+        try:
+            my_order.status = new_status
+            db.session.commit()
+        except Exception as error:
+            pass
     return redirect(url_for('admin_view', view="pending_orders"))
 
 
@@ -541,3 +550,21 @@ def password_reset(customer_id):
     flash(f"{customer.fullname.split(' ')[0]}'s password has been reset. \nPlease inform them to set a new password.",
           "alert-info")
     return redirect(url_for('admin_view', view='customers'))
+
+
+@app.route('/send_us_message', methods=['POST'])
+def send_comment():
+    form = request.form
+    comment = Messages(
+        name=form['contact-name'],
+        phone_number=form['contact-phone'],
+        email_address=form['contact-email'],
+        subject=form['contact-subject'],
+        message=form['contact-message']
+    )
+    try:
+        db.session.add(comment)
+        db.session.commit()
+        flash("Thank you for your message. We will get back to you as soon as we can.", "alert-info")
+    except Exception as error:
+        flash("Sorry, could not send message. Please try again later or call us", "alert-warning")

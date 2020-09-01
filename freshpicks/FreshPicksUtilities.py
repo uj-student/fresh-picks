@@ -59,4 +59,5 @@ def capitaliseName(name):
 
 
 def formatToCurrency(amount):
-    return "%.2f".format(amount)
+    # amount = float(amount)
+    return "{:.2f}".format(float(amount))
