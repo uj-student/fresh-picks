@@ -23,14 +23,14 @@
                                     <div class="form-group">
                                         <label for="full-name">Full Name</label>
                                         <input type="text" class="form-control" name="full-name"
-                                               value="{{ session['user_name'] }}" required>
+                                               value="{{ current_user.fullname }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="home-address">Home Address</label>
                                         <input type="text" class="form-control" name="home-address"
-                                               value="{{ session['user_address'] }}" required>
+                                               value="{{ current_user.address }}" required>
                                     </div>
                                 </div>
                                 <div class="w-100"></div>
@@ -38,7 +38,7 @@
                                     <div class="form-group">
                                         <label for="town-city">Town / City</label>
                                         <input type="text" class="form-control" name="town-city"
-                                               value="{{ session['user_town'] }}" required>
+                                               value="{{ current_user.town }}" required>
                                     </div>
                                 </div>
                                 <div class="w-100"></div>
@@ -60,15 +60,15 @@
                                     <div class="form-group">
                                         <label for="phone-number">Phone Number</label>
                                         <input type="number" class="form-control" name="phone-number"
-                                               value="{{ session['user_phone'] }}" required>
+                                               value="{{ current_user.phone_number }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="email-address">Email Address</label>
                                         <input type="text" class="form-control" name="email-address"
-                                                {% if session['user_email'] %}
-                                               value="{{ session['user_email'] }}"
+                                                {% if current_user.user_email %}
+                                               value="{{ current_user.user_email }}"
                                                 {% else %}
                                                value="No Email Specified"
                                                 {% endif %}>
@@ -83,7 +83,7 @@
                                             <select name="gender" class="form-control">
                                                 <option value="male" selected>Male</option>
                                                 <option value="female"
-                                                        {% if session['user_gender'].lower() == "female" %}
+                                                        {% if current_user.gender.lower() == "female" %}
                                                         selected {% endif %}>Female
                                                 </option>
                                             </select>
@@ -95,7 +95,7 @@
                                     <div class="form-group">
                                         <label for="dob">Date of Birth</label>
                                         <input type="date" class="form-control" name="dob" data-date-format="DD/MM/YYYY"
-                                               value="{{ session['user_dob'] }}" required>
+                                               value="{{ current_user.dob }}" required>
                                     </div>
                                 </div>
 

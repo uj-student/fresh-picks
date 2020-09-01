@@ -1,9 +1,16 @@
 import datetime
 
-from freshpicks import db
+from flask_login import UserMixin
+
+from freshpicks import db, login_manager
 
 
-class Customers(db.Model):
+@login_manager.user_loader
+def load_user(user_id):
+    return Customers.query.get(int(user_id))
+
+
+class Customers(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     fullname = db.Column(db.String(), nullable=False)
     address = db.Column(db.String(), nullable=False)
@@ -54,6 +61,7 @@ class Products(db.Model):
     def __repr__(self):
         return f"Product('{self.id}', '{self.name}', '{self.description}', '{self.price}', '{self.image_location}', " \
                f"'{self.is_basket_item}', {self.is_displayed})"
+
 
 class AdminUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)

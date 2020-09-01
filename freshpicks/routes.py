@@ -3,6 +3,7 @@ import time
 
 from PIL import Image
 from flask import g, render_template, request, redirect, session, url_for, flash
+from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from freshpicks import FreshPicksUtilities, app, db
@@ -10,7 +11,7 @@ from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders, M
 
 # db.create_all()
 # print("Hello")
-lst = Orders.query.all()
+lst = Customers.query.all()
 print(lst)
 print(len(lst))
 
@@ -37,9 +38,8 @@ def about():
 
 
 @app.route('/cart')
+@login_required
 def cart():
-    if not g.user:
-        return redirect(url_for('login'))
     return render_template('cart.html')
 
 
@@ -57,36 +57,15 @@ def products():
     return render_template('products.html', baskets=basket_display_list, extras=extras_display_list)
 
 
-@app.before_request
-def before_request():
-    g.user = None
-    g.admin = None
-
-    if 'user_name' in session:
-        g.user = session['user_name']
-    elif 'admin_username' in session:
-        g.admin = session['admin_username']
-
-
-def is_customer_logged_in():
-    if not g.user:
-        return redirect(url_for('login'))
-
-
-def is_admin_logged_in():
-    if not g.admin:
-        return redirect(url_for('admin'))
-
-
 @app.route('/login', methods=['GET', "POST"])
 def login():
-    if g.user:
+    if current_user.is_authenticated:
         return redirect(url_for('home'))
     if request.method == 'POST':
         req = request.form
 
         customer = Customers.query.filter_by(phone_number=req['phone-number']).first()
-        if customer is None:
+        if not customer:
             flash("Account could not be found. Have you registered?", "alert-warning")
             return redirect(url_for('login'))
         else:
@@ -94,9 +73,12 @@ def login():
                 flash("Incorrect Password", "alert-danger")
                 return redirect(url_for('login'))
 
-        setupUserSession(customer)
+        login_user(customer)
+        previous_page = request.args.get('next')
+
+        # setupUserSession(customer)
         # return redirect(url_for('products'))
-        return redirect(url_for('account'))
+        return redirect(previous_page) if previous_page else redirect(url_for('account'))
 
     return render_template('login.html')
 
@@ -143,7 +125,7 @@ def setupAdminSession(adminUser):
 
 @app.route('/sign-up', methods=['GET', 'POST'])
 def signup():
-    if g.user:
+    if current_user.is_authenticated:
         return redirect(url_for('home'))
     if request.method == 'POST':
         req = request.form
@@ -152,19 +134,37 @@ def signup():
             feedback = "Password must be the same. Please try again."
             return render_template('sign-up.html', feedback=feedback)
 
-        customer = Customers(fullname=req['full-name'],
-                             address=req['home-address'],
-                             town=req['town-city'],
-                             country=req['state-country'],
-                             phone_number=str(req['phone-number']).replace(" ", ""),
-                             email_address=req['email-address'] if req['email-address'] else None,
-                             gender=req['gender'],
-                             dob=req['dob'],
-                             password=generate_password_hash(req['password']),
-                             terms_and_conditions=True)
+        customer = Customers(
+            fullname=req['full-name'],
+            address=req['home-address'],
+            town=req['town-city'],
+            country=req['state-country'],
+            phone_number=str(req['phone-number']).replace(" ", ""),
+            email_address=req['email-address'] if req['email-address'] else None,
+            gender=req['gender'],
+            dob=req['dob'],
+            password=generate_password_hash(req['password']),
+            terms_and_conditions=True
+        )
 
-        db.session.add(customer)
-        db.session.commit()
+        existing_phone_number = Customers.query.filter_by(
+            phone_number=str(req['phone-number']).replace(" ", "")).first()
+        if existing_phone_number:
+            flash("Phone number already registered!", "alert-danger")
+            return redirect(url_for('signup'))
+        if req['email-address']:
+            existing_email_address = Customers.query.filter_by(
+                phone_number=str(req['email-address']).replace(" ", "")).first()
+            if existing_email_address:
+                flash("Email already registered!", "alert-danger")
+                return redirect(url_for('signup'))
+
+        try:
+            db.session.add(customer)
+            db.session.commit()
+        except Exception:
+            flash("Could not create account. Please try later, or call us.", "alert-danger")
+            return redirect(url_for('signup'))
 
         flash(f"Hi {customer.fullname}, thanks for signing up. Please login in to start shopping. Enjoy!",
               "alert-success")
@@ -181,18 +181,18 @@ def signup():
 @app.route('/logout')
 def logout():
     goto = ""
-    if g.user:
-        goto = "home"
-    elif g.admin:
-        goto = "admin"
+    # if g.user:
+    #     goto = "home"
+    # elif g.admin:
+    #     goto = "admin"
     session.clear()
-    return redirect(url_for(goto))
+    logout_user()
+    return redirect(url_for('home'))
 
 
 @app.route('/account', methods=['GET', 'POST'])
+@login_required
 def account():
-    if not g.user:
-        return redirect(url_for('login'))
     if request.method == "POST":
         req = request.form
         phone = req['phone-number']
@@ -201,31 +201,36 @@ def account():
         user_profile = Customers.query.filter_by(id=session['user_id']).first()
 
         if phone != session['user_phone']:
-            check_for_number = Customers.query.filter_by(phone_number=phone).all()
-            if len(check_for_number) < 1:
+            check_for_number = Customers.query.filter_by(phone_number=phone).first()
+            if not check_for_number:
                 user_profile.phone_number = phone
             else:
                 flash("Phone Number already in use.", "alert-info")
                 return redirect(url_for('account'))
+
         if email or email != session['user_email']:
-            check_for_email = Customers.query.filter_by(email_address=email).all()
-            if len(check_for_email) < 1:
+            check_for_email = Customers.query.filter_by(email_address=email).first()
+            if not check_for_email:
                 user_profile.email_address = email
             else:
                 flash("Email address already in use.", "alert-info")
                 return redirect(url_for('account'))
 
-        if req['full-name'] != session['user_name']:
+        if req['full-name'] != current_user.fullname:
             user_profile.fullname = req['full-name']
-        if req['home-address'] != session['user_address']:
+        if req['home-address'] != current_user.address:
             user_profile.address = req['home-address']
-        if req['town-city'] != session['user_town']:
+        if req['town-city'] != current_user.town:
             user_profile.town = req['town-city']
-        if req['gender'] != session['user_gender']:
+        if req['gender'] != current_user.gender:
             user_profile.gender = req['gender']
-        if req['dob'] != session['user_dob']:
+        if req['dob'] != current_user.dob:
             user_profile.dob = req['dob']
-        db.session.commit()
+
+        try:
+            db.session.commit()
+        except Exception:
+            flash("Could not update details. Please try again later, or call us", "alert-warning")
         user_profile = Customers.query.filter_by(id=session['user_id']).first()
         setupUserSession(user_profile)
         flash("Details updated successfully", "alert-info")
@@ -234,10 +239,8 @@ def account():
 
 
 @app.route('/add', methods=['POST'])
+@login_required
 def add_product_to_cart():
-    if not g.user:
-        flash('Please Login to shop.', "alert-warning")
-        return redirect(url_for('login'))
     if request.method == 'POST':
         total_quantity = 0
         total_price = 0
@@ -325,9 +328,8 @@ def clear_cart():
 
 
 @app.route('/place_order', methods=['POST'])
+@login_required
 def process_order():
-    if not g.user:
-        return redirect(url_for('login'))
     if request.method == "POST":
         req = request.form
         if 'my_cart' in session:
