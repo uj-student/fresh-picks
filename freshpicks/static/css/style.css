@@ -8397,7 +8397,7 @@ h1, h2, h3, h4, h5,
           color: #fff;
           line-height: 1.3;
           font-weight: 400;
-          font-family: "Amatic SC", cursive; }
+          font-family: cursive, "Amatic SC"; }
           @media (max-width: 767.98px) {
             .owl-carousel.home-slider .slider-item .slider-text h1 {
               font-size: 40px; } }
