@@ -1,0 +1,107 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Dashboard{% endblock %}
+{% block content %}
+
+    <section class="ftco-section ftco-cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <p class="{{ category }}">{{ message }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+{#                        <div>#}
+{#                            <form action="{{ url_for('admin_view', view='orders') }}">#}
+{#                                <select class="dropdown-toggle" name="orders"#}
+{#                                        data-toggle="dropdown" aria-haspopup="true"#}
+{#                                        onchange="this.form.submit()">#}
+{#                                    <option selected disabled value="current">Pending Orders</option>#}
+{#                                    <option value="all_orders">All Orders</option>#}
+{#                                    <option value="pending_orders">Pending Orders</option>#}
+{#                                    <option value="complete_orders">Complete Orders</option>#}
+{#                                    <option value="cancelled">Cancelled Orders</option>#}
+{#                                </select>#}
+{#                            </form>#}
+{#                        </div>#}
+                        <table class="table">
+                            <thead class="thead-primary">
+                            <tr class="text-center">
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Order Details</th>
+                                <th>Delivery Address</th>
+                                <th>Order Placed on</th>
+                                <th>Amount(ZK)</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if orders_list %}
+                                {% for order in orders_list %}
+                                    <tr class="text-center">
+                                        <form action="/mark_complete" method="post">
+
+                                            <td class="total">
+                                                <h6>{{ order.id }}</h6>
+                                                <input type="text" name="_order_id" value="{{ order.id }}"
+                                                       hidden>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ order.buyer.fullname }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                {% set _order = order.order.splitlines() %}
+                                                {% for i in _order %}
+                                                    <h6>{{ i }}</h6>
+                                                {% endfor %}
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ order.delivery_address }}</h6>
+                                                {% if order.additional_instructions %}
+                                                    <h6 class="ion-ios-information-circle-outline text-success">{{ order.additional_instructions }}</h6>
+                                                {% endif %}
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ order.date_ordered }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ "%.2f"|format(order.total_price) }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <select class="dropdown-toggle" name="_order_status"
+                                                        data-toggle="dropdown" aria-haspopup="true"
+                                                        onchange="this.form.submit()">
+                                                    <option selected disabled hidden
+                                                            value="current">{{ order.status }}</option>
+                                                    <option value="pending">Pending</option>
+                                                    <option value="cancel">Cancel</option>
+                                                    <option value="complete">Complete</option>
+                                                </select>
+                                                <input type="text" name="_current_status" value="{{ order.status }}"
+                                                       hidden>
+                                            </td>
+                                        </form>
+                                    </tr><!-- END TR-->
+                                {% endfor %}
+                            {% endif %}
+                            </tbody><!-- END TBODY-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+

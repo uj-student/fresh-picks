@@ -1,0 +1,90 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Dashboard{% endblock %}
+{% block content %}
+
+    <section class="ftco-section ftco-cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <p class="{{ category }}">{{ message }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <div>
+                            <form action="{{ url_for('admin_view', view='customer_messages') }}">
+                                <select class="dropdown-toggle" name="_manage_users"
+                                        data-toggle="dropdown" aria-haspopup="true"
+                                        onchange="this.form.submit()">
+                                    <option selected disabled value="current">Open</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                            </form>
+                        </div>
+                        <table class="table">
+                            <thead class="thead-primary">
+                            <tr class="text-center">
+                                <th>#</th>
+                                <th>Messenger</th>
+                                <th>Cell#</th>
+                                <th>Email</th>
+                                <th>Subject</th>
+                                <th>Message</th>
+                                <th>Sent</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if messages_list %}
+                                {% for msg in messages_list %}
+                                    <tr class="text-center">
+                                        <form action="/mark_complete" method="post">
+                                            <td class="total">
+                                                <h6>{{ msg.id }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ msg.name }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ msg.phone_number }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ msg.email_address }}</h6>
+                                            </td>
+
+                                            <td class="name">
+                                                <h6>{{ msg.subject }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ msg.message }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ msg.date_sent }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ msg.status }}</h6>
+                                                <h6>{{ msg.date_updated }}</h6>
+                                            </td>
+                                        </form>
+                                    </tr><!-- END TR-->
+                                {% endfor %}
+                            {% endif %}
+                            </tbody><!-- END TBODY-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

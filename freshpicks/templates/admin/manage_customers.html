@@ -1,0 +1,97 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Dashboard{% endblock %}
+{% block content %}
+
+    <section class="ftco-section ftco-cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+                     {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <p class="{{ category }}">{{ message }}</p>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+
+                        <div>
+                            <form action="{{ url_for('admin_view', view='admin_users') }}">
+                                <select class="dropdown-toggle" name="_manage_users"
+                                        data-toggle="dropdown" aria-haspopup="true"
+                                        onchange="this.form.submit()">
+                                    <option selected disabled value="current">Customers</option>
+                                    <option value="admin_users">Admin Users</option>
+                                </select>
+                            </form>
+                        </div>
+                        <table class="table">
+                            <thead class="thead-primary">
+                            <tr class="text-center">
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Phone Number</th>
+                                <th>Gender</th>
+                                <th>Birthday</th>
+                                <th>Email</th>
+                                <th>Sign-Up Date</th>
+                                <th> </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if customer_list %}
+                                {% for customer in customer_list %}
+                                    <tr class="text-center">
+                                        <form action="/mark_complete" method="post">
+                                            <td class="total">
+                                                <h6>{{ customer.id }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.fullname }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.address }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.phone_number }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.gender }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.dob }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.email_address }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <h6>{{ customer.date_registered }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                <a href="{{ url_for('password_reset', customer_id=customer.id) }}" class="alert-link">
+                                                        <h6>{{ "Reset Password" }}</h6>
+                                                        <span class="ion-ios-refresh"></span>
+                                                </a>
+                                            </td>
+                                        </form>
+                                    </tr><!-- END TR-->
+                                {% endfor %}
+                            {% endif %}
+                            </tbody><!-- END TBODY-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

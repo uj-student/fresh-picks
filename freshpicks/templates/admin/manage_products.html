@@ -1,0 +1,72 @@
+{% extends 'admin/admin_template.html' %}
+{% block navbar %}Dashboard{% endblock %}
+{% block content %}
+
+    <section class="ftco-section ftco-cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+
+                        <div>
+                            <a type="button" class="col-md-2 btn btn-primary" href="{{ url_for('add_product') }}">
+                                Add Product +
+                            </a>
+                        </div>
+                        <table class="table">
+                            <thead class="thead-primary">
+                            <tr class="text-center">
+                                <th></th>
+                                <th>Description</th>
+                                <th>Basket</th>
+                                <th>Price</th>
+                                <th>Display</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if product_list %}
+                                {% for item in product_list %}
+                                    <tr class="text-center">
+                                        <td class="image-prod">
+                                            <div class="img"
+                                                 style="background-image:url({{ item.image_location }});">
+                                            </div>
+                                            <h6>{{ item.name }}</h6>
+                                        </td>
+                                        <td class="product-name">
+                                            <h6>{{ item.description }}</h6>
+                                        </td>
+
+                                        <td class="product-category">
+                                            <h6>{{ "Yes" if item.is_basket_item else "No" }}</h6>
+                                        </td>
+
+                                        <td class="product-category">
+                                            <h6>{{ item.price }}</h6>
+                                        </td>
+
+                                        <td class="product-category">
+                                            <a href="{{ url_for('toggle_product_display', product_id=item.id) }}"
+                                               class="alert-link">
+                                                {% if  item.is_displayed %}
+                                                    <h6>{{ "Yes" }}</h6>
+                                                    <span class="ion-ios-checkmark-circle-outline"></span>
+                                                {% else %}
+                                                    <h6>{{ "No" }}</h6>
+                                                    <span class="ion-ios-close-circle-outline"></span>
+                                                {% endif %}
+                                            </a>
+                                        </td>
+                                    </tr><!-- END TR-->
+                                {% endfor %}
+                            {% endif %}
+                            </tbody><!-- END TBODY-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

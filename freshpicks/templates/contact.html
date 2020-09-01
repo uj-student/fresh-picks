@@ -1,0 +1,80 @@
+{% extends 'base_template.html' %}
+{% block title %} FreshPicks - Contact {% endblock %}
+{% block navbar %} FreshPicks {% endblock %}
+{% block content %}
+
+    <div class="hero-wrap hero-bread" style="background-image: url('../static/images/bg_1.jpg');">
+        <div class="container">
+            <div class="row no-gutters slider-text align-items-center justify-content-center">
+                <div class="col-md-9 ftco-animate text-center">
+                    <h1 class="mb-0 bread">Contact us</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="ftco-section contact-section bg-light">
+        <div class="container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <div class="row d-flex mb-5 contact-info">
+                <div class="w-100"></div>
+                <div class="col-md-4 d-flex">
+                    <div class="info bg-white p-4">
+                        <p><span>Address:</span> Lusaka, Zambia</p>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex">
+                    <div class="info bg-white p-4">
+                        <p><span>Phone:</span> <a href="tel://+260 96 7062763">+260 96 7062763</a></p>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex">
+                    <div class="info bg-white p-4">
+                        <p><span>Email:</span> <a href="mailto:info@yoursite.com">freshpicks@gmail.com</a></p>
+                    </div>
+                </div>
+            </div>
+            <div class="row block-9">
+                <div class="col-md-6 order-md-last d-flex">
+                    <form action="{{ url_for('send_comment') }}" method="post" class="bg-white p-5 contact-form">
+                        <h2>Leave us a message</h2>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="contact-name" placeholder="Your Name"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <input type="number" class="form-control" name="contact-phone"
+                                   placeholder="Your Phone Number" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="contact-email"
+                                   placeholder="Your Email (Optional)">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="contact-subject" placeholder="Subject"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                        <textarea name="contact-message" id="" cols="30" rows="7" class="form-control"
+                                  placeholder="Your Message" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-md-6 d-flex">
+                    <div id="map" class="bg-white"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
