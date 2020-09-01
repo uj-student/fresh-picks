@@ -552,19 +552,22 @@ def password_reset(customer_id):
     return redirect(url_for('admin_view', view='customers'))
 
 
-@app.route('/send_us_message', methods=['POST'])
+@app.route('/send_us_message', methods=['POST', 'GET'])
 def send_comment():
-    form = request.form
-    comment = Messages(
-        name=form['contact-name'],
-        phone_number=form['contact-phone'],
-        email_address=form['contact-email'],
-        subject=form['contact-subject'],
-        message=form['contact-message']
-    )
-    try:
-        db.session.add(comment)
-        db.session.commit()
-        flash("Thank you for your message. We will get back to you as soon as we can.", "alert-info")
-    except Exception as error:
-        flash("Sorry, could not send message. Please try again later or call us", "alert-warning")
+    if request.method == 'POST':
+        form = request.form
+        comment = Messages(
+            name=form['contact-name'],
+            phone_number=form['contact-phone'],
+            email_address=form['contact-email'],
+            subject=form['contact-subject'],
+            message=form['contact-message']
+        )
+        try:
+            db.session.add(comment)
+            db.session.commit()
+            flash("Thank you for your message. We will get back to you as soon as we can.", "alert-info")
+        except Exception as error:
+            print(error)
+            flash("Sorry, could not send message. Please try again later or call us", "alert-warning")
+    return redirect(url_for('contact'))

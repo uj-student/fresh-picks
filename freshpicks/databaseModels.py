@@ -71,7 +71,7 @@ class AdminUsers(db.Model):
 
 class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
-    name = db.Column(db.String(), unique=True, nullable=False)
+    name = db.Column(db.String(), nullable=False)
     phone_number = db.Column(db.String, nullable=False)
     email_address = db.Column(db.String, nullable=True)
     subject = db.Column(db.String, nullable=False)
