@@ -15,6 +15,7 @@ lst = Customers.query.all()
 print(lst)
 print(len(lst))
 
+PER_PAGE_VIEW = 1
 
 @app.route('/')
 @app.route('/home')
@@ -377,25 +378,31 @@ my_views = {
 def admin_view(view):
     if not g.admin:
         return redirect(url_for('admin'))
-    orders = ""
+    page = request.args.get('page', 1, type=int)
+
     if "orders" in view:
+        orders = "" # need this to handle the filter in the view
+        order_type = "all_orders"
         if view == "pending_orders":
-            orders = Orders.query.filter_by(status="pending")
+            orders = Orders.query.filter_by(status="pending").paginate(per_page=PER_PAGE_VIEW, page=page)
+            order_type = "pending_orders"
         if view == "completed_orders":
-            orders = Orders.query.filter_by(status="complete")
+            orders = Orders.query.filter_by(status="complete").paginate(per_page=PER_PAGE_VIEW, page=page)
+            order_type = "completed_orders"
         elif view == "cancelled_orders":
-            orders = Orders.query.filter_by(status="cancel")
+            orders = Orders.query.filter_by(status="cancel").paginate(per_page=PER_PAGE_VIEW, page=page)
+            order_type = "cancelled_orders"
         elif view == "all_orders":
-            orders = Orders.query.all()
-        return render_template('admin/manage_orders.html', orders_list=orders)
+            orders = Orders.query.paginate(per_page=PER_PAGE_VIEW, page=page)
+        return render_template('admin/manage_orders.html', order_type=order_type, orders_list=orders)
     elif view == "customers":
-        customer_list = Customers.query.all()
+        customer_list = Customers.query.order_by(Customers.fullname.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_customers.html', customer_list=customer_list)
     elif view == "admin_users":
         admin_list = AdminUsers.query.all()
         return render_template('admin/manage_users.html', admin_list=admin_list)
     elif view == "products":
-        product_list = Products.query.all()
+        product_list = Products.query.order_by(Products.is_basket_item.desc(), Products.name.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_products.html', product_list=product_list)
     elif view == "customer_messages":
         messages_list = Messages.query.all()
