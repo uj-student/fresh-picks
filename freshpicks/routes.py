@@ -11,7 +11,7 @@ from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders, M
 
 # db.create_all()
 # print("Hello")
-lst = Customers.query.all()
+lst = AdminUsers.query.all()
 print(lst)
 print(len(lst))
 
@@ -399,7 +399,7 @@ def admin_view(view):
         customer_list = Customers.query.order_by(Customers.fullname.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_customers.html', customer_list=customer_list)
     elif view == "admin_users":
-        admin_list = AdminUsers.query.all()
+        admin_list = AdminUsers.query.order_by(AdminUsers.username.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_users.html', admin_list=admin_list)
     elif view == "products":
         product_list = Products.query.order_by(Products.is_basket_item.desc(), Products.name.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
