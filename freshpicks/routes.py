@@ -32,9 +32,9 @@ def about():
     return render_template('about.html')
 
 
-# @app.route('/shop')
-# def shop():
-#     return render_template('shop.html')
+@app.route('/test')
+def shop():
+    return render_template('shop.html')
 
 
 @app.route('/cart')
@@ -55,6 +55,15 @@ def products():
         else:
             extras_display_list.append(item)
     return render_template('products.html', baskets=basket_display_list, extras=extras_display_list)
+
+
+@app.before_request
+def before_request():
+    g.user = None
+    g.admin = None
+
+    if 'admin_username' in session:
+        g.admin = session['admin_username']
 
 
 @app.route('/login', methods=['GET', "POST"])
@@ -198,18 +207,18 @@ def account():
         phone = req['phone-number']
         email = req['email-address']
 
-        user_profile = Customers.query.filter_by(id=session['user_id']).first()
+        user_profile = Customers.query.filter_by(id=current_user.id).first()
 
-        if phone != session['user_phone']:
-            check_for_number = Customers.query.filter_by(phone_number=phone).first()
+        if phone != current_user.phone_number:
+            check_for_number = Customers.query.filter_by(phone_number=current_user.phone_number).first()
             if not check_for_number:
                 user_profile.phone_number = phone
             else:
                 flash("Phone Number already in use.", "alert-info")
                 return redirect(url_for('account'))
 
-        if email or email != session['user_email']:
-            check_for_email = Customers.query.filter_by(email_address=email).first()
+        if email and email != current_user.email_address:
+            check_for_email = Customers.query.filter_by(email_address=current_user.email_address).first()
             if not check_for_email:
                 user_profile.email_address = email
             else:
@@ -231,8 +240,9 @@ def account():
             db.session.commit()
         except Exception:
             flash("Could not update details. Please try again later, or call us", "alert-warning")
-        user_profile = Customers.query.filter_by(id=session['user_id']).first()
-        setupUserSession(user_profile)
+        user_profile = Customers.query.filter_by(id=current_user.id).first()
+        # login_user(user_profile)
+        # setupUserSession(user_profile)
         flash("Details updated successfully", "alert-info")
         return redirect(url_for('account'))
     return render_template('account.html')

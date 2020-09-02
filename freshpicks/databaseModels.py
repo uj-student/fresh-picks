@@ -1,8 +1,7 @@
 import datetime
 
-from flask_login import UserMixin
-
 from freshpicks import db, login_manager
+from flask_login import UserMixin
 
 
 @login_manager.user_loader
@@ -63,7 +62,7 @@ class Products(db.Model):
                f"'{self.is_basket_item}', {self.is_displayed})"
 
 
-class AdminUsers(db.Model):
+class AdminUsers(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     username = db.Column(db.String(), nullable=False, unique=True)
     password = db.Column(db.String(), nullable=False)
@@ -87,3 +86,9 @@ class Messages(db.Model):
     status = db.Column(db.String, nullable=False, default='open')
     date_sent = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
     date_updated = db.Column(db.TIMESTAMP(), nullable=True)
+
+
+class EmailSubscriptions(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
+    email_address = db.Column(db.String(), nullable=False)
+    sign_up_date = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)

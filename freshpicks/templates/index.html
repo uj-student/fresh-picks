@@ -13,7 +13,7 @@
                         <div class="col-md-12 ftco-animate text-center">
                             <h1 class="mb-2">We serve Fresh Vegetables &amp; Fruits</h1>
                             <h2 class="subheading mb-4">We deliver organic vegetables &amp; fruits</h2>
-                            {% if not g.user %}
+                            {% if not current_user.is_authenticated %}
                                 <p><a href="/sign-up" class="col-md-3 btn btn-primary">Sign Up</a></p>
                             {% endif %}
                         </div>
@@ -29,7 +29,7 @@
                         <div class="col-sm-12 ftco-animate text-center">
                             <h1 class="mb-2">100% Fresh &amp; Organic Foods</h1>
                             <h2 class="subheading mb-4">We deliver organic vegetables &amp; fruits</h2>
-                            {% if not g.user %}
+                            {% if not current_user.is_authenticated %}
                                 <p><a href="/sign-up" class="col-md-3 btn btn-primary">Sign Up</a></p>
                             {% endif %}
                         </div>
