@@ -9,11 +9,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from freshpicks import FreshPicksUtilities, app, db
 from freshpicks.databaseModels import Customers, AdminUsers, Products, Orders, Messages
 
-# db.create_all()
-# print("Hello")
-lst = AdminUsers.query.all()
-print(lst)
-print(len(lst))
 
 PER_PAGE_VIEW = 1
 
@@ -405,7 +400,7 @@ def admin_view(view):
         product_list = Products.query.order_by(Products.is_basket_item.desc(), Products.name.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_products.html', product_list=product_list)
     elif view == "customer_messages":
-        messages_list = Messages.query.all()
+        messages_list = Messages.query.order_by(Messages.date_sent.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_comments.html', messages_list=messages_list)
     return render_template('admin/manage_products.html', product_list=[])
 

@@ -36,7 +36,7 @@
                                 <th>Birthday</th>
                                 <th>Email</th>
                                 <th>Sign-Up Date</th>
-                                <th></th>
+                                <th>Reset Password</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -73,13 +73,12 @@
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ customer.date_registered }}</h6>
+                                                <h6>{{ customer.date_registered.strftime("%Y-%m-%d %H:%M:%S") }}</h6>
                                             </td>
 
                                             <td class="product-name">
                                                 <a href="{{ url_for('password_reset', customer_id=customer.id) }}"
                                                    class="alert-link">
-                                                    <h6>{{ "Reset Password" }}</h6>
                                                     <span class="ion-ios-refresh"></span>
                                                 </a>
                                             </td>

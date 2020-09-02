@@ -71,7 +71,7 @@
                                             </td>
 
                                             <td class="categories">
-                                                <h6>{{ order.date_ordered }}</h6>
+                                                <h6>{{ order.date_ordered.strftime('%Y-%m-%d %H:%M:%S') }}</h6>
                                             </td>
 
                                             <td class="categories">
@@ -97,7 +97,6 @@
                             {% endif %}
                             </tbody><!-- END TBODY-->
                         </table>
-
                         <div class="row mt-5">
                             <div class="col text-center">
                                 <div class="block-27">
@@ -127,8 +126,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>

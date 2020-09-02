@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                             {% if messages_list %}
-                                {% for msg in messages_list %}
+                                {% for msg in messages_list.items %}
                                     <tr class="text-center">
                                         <form action="/mark_complete" method="post">
                                             <td class="total">
@@ -55,7 +55,7 @@
                                                 <h6>{{ msg.phone_number }}</h6>
                                             </td>
 
-                                            <td class="product-name">
+                                            <td class="categories">
                                                 <h6>{{ msg.email_address }}</h6>
                                             </td>
 
@@ -67,13 +67,15 @@
                                                 <h6>{{ msg.message }}</h6>
                                             </td>
 
-                                            <td class="categories">
-                                                <h6>{{ msg.date_sent }}</h6>
+                                            <td class="name">
+                                                <h6>{{ msg.date_sent.strftime("%Y-%m-%d %H:%M:%S") }}</h6>
                                             </td>
 
                                             <td class="categories">
                                                 <h6>{{ msg.status }}</h6>
-                                                <h6>{{ msg.date_updated }}</h6>
+                                                {% if  msg.date_updated%}
+                                                    <h6>{{ msg.date_updated }}</h6>
+                                                {% endif %}
                                             </td>
                                         </form>
                                     </tr><!-- END TR-->
@@ -81,6 +83,35 @@
                             {% endif %}
                             </tbody><!-- END TBODY-->
                         </table>
+                        <div class="row mt-5">
+                            <div class="col text-center">
+                                <div class="block-27">
+                                    <ul>
+                                        <li><a href="#">&lt;</a></li>
+                                        {% for page_num in messages_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                            {% if page_num %}
+                                                {% if messages_list.page == page_num %}
+                                                    <li class="active"
+                                                        href="{{ url_for('admin_view', view='customer_messages', page=page_num) }}">
+                                                        <span>{{ page_num }}</span></li>
+                                                {% else %}
+                                                    <li>
+                                                        <a href="{{ url_for('admin_view', view='customer_messages', page=page_num) }}">{{ page_num }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% else %}
+                                                <li>
+                                                    <a href="{{ url_for('admin_view', view='customer_messages', page=right_edge) }}">...</a>
+                                                </li>
+
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li><a href="#">&gt;</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
