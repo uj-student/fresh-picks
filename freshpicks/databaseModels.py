@@ -21,7 +21,7 @@ class Customers(db.Model, UserMixin):
     dob = db.Column(db.String(), nullable=False)
     password = db.Column(db.String(), nullable=True)
     terms_and_conditions = db.Column(db.Boolean(), nullable=False)
-    date_registered = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
+    date_registered = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)
     orders = db.relationship('Orders', backref='buyer', lazy=True)
 
     def __repr__(self):
@@ -36,7 +36,7 @@ class Orders(db.Model):
     order = db.Column(db.String(), nullable=False)
     total_price = db.Column(db.Float(), nullable=False)
     delivery_address = db.Column(db.String(), nullable=False)
-    date_ordered = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
+    date_ordered = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)
     additional_instructions = db.Column(db.String(), nullable=True)
     status = db.Column(db.String(), nullable=False, default="pending")
     date_completed = db.Column(db.TIMESTAMP(), nullable=True)
@@ -69,7 +69,7 @@ class AdminUsers(db.Model, UserMixin):
     cellphone_number = db.Column(db.String(), nullable=False, unique=True)
     name = db.Column(db.String(), nullable=False, unique=True)
     email_address = db.Column(db.String(), unique=True, nullable=False)
-    date_created = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
+    date_created = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)
 
     def __repr__(self):
         return f"Admin('{self.id}', '{self.username}', '{self.cellphone_number}', '{self.name}', '{self.email_address}', " \
@@ -84,11 +84,11 @@ class Messages(db.Model):
     subject = db.Column(db.String, nullable=False)
     message = db.Column(db.Text, nullable=False)
     status = db.Column(db.String, nullable=False, default='open')
-    date_sent = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
+    date_sent = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)
     date_updated = db.Column(db.TIMESTAMP(), nullable=True)
 
 
 class EmailSubscriptions(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     email_address = db.Column(db.String(), nullable=False)
-    sign_up_date = db.Column(db.TIMESTAMP(), default=datetime.datetime.utcnow(), nullable=False)
+    sign_up_date = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)
