@@ -19,7 +19,8 @@
                                 </form>
                             </div>
                             <div>
-                                <a type="submit" class="btn btn-primary" href="{{ url_for('add_admin_user') }}">Add Admin +</a>
+                                <a type="submit" class="btn btn-primary" href="{{ url_for('add_admin_user') }}">Add
+                                    Admin +</a>
                             </div>
                         </div>
 
@@ -37,7 +38,7 @@
                             </thead>
                             <tbody>
                             {% if admin_list %}
-                                {% for admin in admin_list %}
+                                {% for admin in admin_list.items %}
                                     <tr class="text-center">
                                         <form action="/mark_complete" method="post">
                                             <td class="total">
@@ -61,7 +62,7 @@
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ admin.date_created }}</h6>
+                                                <h6>{{ admin.date_created.strftime("%Y-%m-%d %H:%M:%S") }}</h6>
                                             </td>
 
                                             {#                                            <td class="product-name">#}
@@ -84,6 +85,38 @@
                             {% endif %}
                             </tbody><!-- END TBODY-->
                         </table>
+
+                        <div class="row mt-5">
+                            <div class="col text-center">
+                                <div class="block-27">
+                                    <ul>
+                                        <li><a href="#">&lt;</a></li>
+                                        {% for page_num in admin_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                            {% if page_num %}
+                                                {% if admin_list.page == page_num %}
+                                                    <li class="active"
+                                                        href="{{ url_for('admin_view', view='admin_users', page=page_num) }}">
+                                                        <span>{{ page_num }}</span></li>
+                                                {% else %}
+                                                    <li>
+                                                        <a href="{{ url_for('admin_view', view='admin_users', page=page_num) }}">{{ page_num }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% else %}
+                                                <li>
+                                                    <a href="{{ url_for('admin_view', view='admin_users', page=right_edge) }}">...</a>
+                                                </li>
+
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li><a href="#">&gt;</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
             </div>

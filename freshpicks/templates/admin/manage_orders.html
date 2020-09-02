@@ -15,19 +15,19 @@
                             {% endif %}
                         {% endwith %}
 
-{#                        <div>#}
-{#                            <form action="{{ url_for('admin_view', view='orders') }}">#}
-{#                                <select class="dropdown-toggle" name="orders"#}
-{#                                        data-toggle="dropdown" aria-haspopup="true"#}
-{#                                        onchange="this.form.submit()">#}
-{#                                    <option selected disabled value="current">Pending Orders</option>#}
-{#                                    <option value="all_orders">All Orders</option>#}
-{#                                    <option value="pending_orders">Pending Orders</option>#}
-{#                                    <option value="complete_orders">Complete Orders</option>#}
-{#                                    <option value="cancelled">Cancelled Orders</option>#}
-{#                                </select>#}
-{#                            </form>#}
-{#                        </div>#}
+                        {#                        <div>#}
+                        {#                            <form action="{{ url_for('admin_view', view='orders') }}">#}
+                        {#                                <select class="dropdown-toggle" name="orders"#}
+                        {#                                        data-toggle="dropdown" aria-haspopup="true"#}
+                        {#                                        onchange="this.form.submit()">#}
+                        {#                                    <option selected disabled value="current">Pending Orders</option>#}
+                        {#                                    <option value="all_orders">All Orders</option>#}
+                        {#                                    <option value="pending_orders">Pending Orders</option>#}
+                        {#                                    <option value="complete_orders">Complete Orders</option>#}
+                        {#                                    <option value="cancelled">Cancelled Orders</option>#}
+                        {#                                </select>#}
+                        {#                            </form>#}
+                        {#                        </div>#}
                         <table class="table">
                             <thead class="thead-primary">
                             <tr class="text-center">
@@ -42,7 +42,7 @@
                             </thead>
                             <tbody>
                             {% if orders_list %}
-                                {% for order in orders_list %}
+                                {% for order in orders_list.items %}
                                     <tr class="text-center">
                                         <form action="/mark_complete" method="post">
 
@@ -71,7 +71,7 @@
                                             </td>
 
                                             <td class="categories">
-                                                <h6>{{ order.date_ordered }}</h6>
+                                                <h6>{{ order.date_ordered.strftime('%Y-%m-%d %H:%M:%S') }}</h6>
                                             </td>
 
                                             <td class="categories">
@@ -97,6 +97,35 @@
                             {% endif %}
                             </tbody><!-- END TBODY-->
                         </table>
+                        <div class="row mt-5">
+                            <div class="col text-center">
+                                <div class="block-27">
+                                    <ul>
+                                        <li><a href="#">&lt;</a></li>
+                                        {% for page_num in orders_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                            {% if page_num %}
+                                                {% if orders_list.page == page_num %}
+                                                    <li class="active"
+                                                        href="{{ url_for('admin_view', view=order_type, page=page_num) }}">
+                                                        <span>{{ page_num }}</span></li>
+                                                {% else %}
+                                                    <li>
+                                                        <a href="{{ url_for('admin_view', view=order_type, page=page_num) }}">{{ page_num }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% else %}
+                                                <li>
+                                                    <a href="{{ url_for('admin_view', view=order_type,  page=right_edge) }}">...</a>
+                                                </li>
+
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li><a href="#">&gt;</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

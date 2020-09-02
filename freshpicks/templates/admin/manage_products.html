@@ -26,7 +26,7 @@
                             </thead>
                             <tbody>
                             {% if product_list %}
-                                {% for item in product_list %}
+                                {% for item in product_list.items %}
                                     <tr class="text-center">
                                         <td class="image-prod">
                                             <div class="img"
@@ -43,7 +43,7 @@
                                         </td>
 
                                         <td class="product-category">
-                                            <h6>{{ item.price }}</h6>
+                                            <h6>{{ "%.2f"|format(item.price) }}</h6>
                                         </td>
 
                                         <td class="product-category">
@@ -63,6 +63,38 @@
                             {% endif %}
                             </tbody><!-- END TBODY-->
                         </table>
+
+                        <div class="row mt-5">
+                            <div class="col text-center">
+                                <div class="block-27">
+                                    <ul>
+                                        <li><a href="#">&lt;</a></li>
+                                        {% for page_num in product_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                            {% if page_num %}
+                                                {% if product_list.page == page_num %}
+                                                    <li class="active"
+                                                        href="{{ url_for('admin_view', view='products', page=page_num) }}">
+                                                        <span>{{ page_num }}</span></li>
+                                                {% else %}
+                                                    <li>
+                                                        <a href="{{ url_for('admin_view', view='products', page=page_num) }}">{{ page_num }}</a>
+                                                    </li>
+                                                {% endif %}
+                                            {% else %}
+                                                <li>
+                                                    <a href="{{ url_for('admin_view', view='products', page=right_edge) }}">...</a>
+                                                </li>
+
+                                            {% endif %}
+                                        {% endfor %}
+                                        <li><a href="#">&gt;</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
             </div>
