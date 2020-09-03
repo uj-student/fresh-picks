@@ -2,7 +2,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-from .commands import create_tables
+from freshpicks.commands import create_tables
 
 db = SQLAlchemy()
 login_manager = LoginManager()
