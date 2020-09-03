@@ -152,6 +152,11 @@ def account():
     return render_template('account.html')
 
 
+@customers.route('/cart')
+@login_required
+def cart():
+    return render_template('cart.html')
+
 @customers.route('/add', methods=['POST'])
 @login_required
 def add_product_to_cart():

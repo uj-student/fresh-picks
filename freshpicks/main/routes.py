@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for
-from flask_login import logout_user, login_required
+from flask_login import logout_user
 
 from freshpicks.databaseModels import Products
 
@@ -10,6 +10,7 @@ main = Blueprint('main', __name__)
 @main.route('/home')
 def home():
     return render_template('index.html')
+
 
 @main.route('/logout')
 def logout():
@@ -38,14 +39,9 @@ def shop():
     return render_template('shop.html')
 
 
-@main.route('/cart')
-@login_required
-def cart():
-    return render_template('cart.html')
-
-
 @main.route('/products')
 def products():
+    product_list = ''
     try:
         product_list = Products.query.filter_by(is_displayed=True)
     except Exception as error:
@@ -53,10 +49,10 @@ def products():
     basket_display_list = []
     extras_display_list = []
 
-    for item in product_list:
-        if item.is_basket_item:
-            basket_display_list.append(item)
-        else:
-            extras_display_list.append(item)
+    if product_list:
+        for item in product_list:
+            if item.is_basket_item:
+                basket_display_list.append(item)
+            else:
+                extras_display_list.append(item)
     return render_template('products.html', baskets=basket_display_list, extras=extras_display_list)
-
