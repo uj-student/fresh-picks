@@ -1,6 +1,6 @@
 import datetime
 
-from freshpicks import db, login_manager
+from .extensions import db, login_manager
 from flask_login import UserMixin
 
 
