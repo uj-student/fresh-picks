@@ -66,9 +66,9 @@ def admin_view(view):
             per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_products.html', product_list=product_list)
     elif view == "customer_messages":
-        order_status = request.args.get('_message_status') if request.args.get('_message_status') else 'open'
-        messages = Messages.query.order_by(Messages.date_sent.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
-        return render_template('admin/manage_comments.html', order_status=order_status, messages_list=messages)
+        status = request.args.get('msg_status') if request.args.get('msg_status') else 'open'
+        messages = Messages.query.filter_by(status=status).order_by(Messages.date_sent.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
+        return render_template('admin/manage_comments.html', msg_status=status, messages_list=messages)
     return render_template('admin/manage_products.html', product_list=[])
 
 
