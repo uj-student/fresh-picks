@@ -1,4 +1,5 @@
 from flask import Flask
+# from dotenv import load_dotenv
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -15,6 +16,7 @@ def create_app(config_file='settings.py'):
     app = Flask(__name__)
 
     app.config.from_pyfile(config_file)
+    # load_dotenv(config_file)
 
     db.init_app(app)
     login_manager.init_app(app)

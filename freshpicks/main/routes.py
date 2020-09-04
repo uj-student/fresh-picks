@@ -15,11 +15,6 @@ def home():
 
 @main.route('/logout')
 def logout():
-    goto = ""
-    # if g.user:
-    #     goto = "home"
-    # elif g.admin:
-    #     goto = "admin"
     session.clear()
     logout_user()
     return redirect(url_for('.home'))

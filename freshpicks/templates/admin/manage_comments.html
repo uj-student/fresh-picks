@@ -15,12 +15,14 @@
                             {% endif %}
                         {% endwith %}
 
+                    {% set _msg_status = order_status %}
                         <div>
                             <form action="{{ url_for('.admin_view', view='customer_messages') }}">
-                                <select class="dropdown-toggle" name="_manage_users"
+                                <select class="dropdown-toggle" name="_message_status"
                                         data-toggle="dropdown" aria-haspopup="true"
                                         onchange="this.form.submit()">
-                                    <option selected disabled value="current">Open</option>
+                                    <option selected disabled value="current">{{ _msg_status }}</option>
+                                    <option value="open">Open</option>
                                     <option value="closed">Closed</option>
                                 </select>
                             </form>
@@ -41,42 +43,56 @@
                             <tbody>
                             {% if messages_list %}
                                 {% for msg in messages_list.items %}
-                                    <tr class="text-center">
-                                        <td class="total">
-                                            <h6>{{ msg.id }}</h6>
-                                        </td>
+                                    {% if msg.status == _msg_status %}
+                                        <tr class="text-center">
+                                            <td class="total">
+                                                <h6>{{ msg.id }}</h6>
+                                            </td>
 
-                                        <td class="categories">
-                                            <h6>{{ msg.name }}</h6>
-                                        </td>
+                                            <td class="categories">
+                                                <h6>{{ msg.name }}</h6>
+                                            </td>
 
-                                        <td class="categories">
-                                            <h6>{{ msg.phone_number }}</h6>
-                                        </td>
+                                            <td class="categories">
+                                                <h6>{{ msg.phone_number }}</h6>
+                                            </td>
 
-                                        <td class="categories">
-                                            <h6>{{ msg.email_address }}</h6>
-                                        </td>
+                                            <td class="categories">
+                                                <h6>{{ msg.email_address }}</h6>
+                                            </td>
 
-                                        <td class="name">
-                                            <h6>{{ msg.subject }}</h6>
-                                        </td>
+                                            <td class="name">
+                                                <h6>{{ msg.subject }}</h6>
+                                            </td>
 
-                                        <td class="product-name">
-                                            <h6>{{ msg.message }}</h6>
-                                        </td>
+                                            <td class="product-name">
+                                                <h6>{{ msg.message }}</h6>
+                                            </td>
 
-                                        <td class="name">
-                                            <h6>{{ msg.date_sent.strftime("%Y-%m-%d %H:%M:%S") }}</h6>
-                                        </td>
+                                            <td class="name">
+                                                <h6>{{ msg.date_sent.strftime("%Y-%m-%d %H:%M:%S") }}</h6>
+                                            </td>
 
-                                        <td class="categories">
-                                            <h6>{{ msg.status }}</h6>
-                                            {% if  msg.date_updated %}
-                                                <h6>{{ msg.date_updated }}</h6>
-                                            {% endif %}
-                                        </td>
-                                    </tr><!-- END TR-->
+                                            <td class="categories">
+                                                                                            <h6>{{ msg.status }}</h6>
+                                                                                            {% if  msg.date_updated %}
+                                                                                                <h6>{{ msg.date_updated }}</h6>
+                                                                                            {% endif %}
+
+{#                                                <form action="{{ url_for('.update_message', comment_id=msg.id) }}"#}
+{#                                                      method="post">#}
+{#                                                    <select class="dropdown-toggle" name="_msg_status"#}
+{#                                                            data-toggle="dropdown" aria-haspopup="true"#}
+{#                                                            onchange="this.form.submit()">#}
+{#                                                        <option selected disabled value="current">{{ msg. }}</option>#}
+{#                                                        <option value="closed">Closed</option>#}
+{#                                                    </select>#}
+{#                                                </form>#}
+
+
+                                            </td>
+                                        </tr><!-- END TR-->
+                                    {% endif %}
                                 {% endfor %}
                             {% endif %}
                             </tbody><!-- END TBODY-->
