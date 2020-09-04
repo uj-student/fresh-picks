@@ -6,36 +6,31 @@
 
     <section class="ftco-section">f
         {% block main %}
-
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-xl-7 ftco-animate">
                         {% with messages = get_flashed_messages(with_categories=true) %}
-                                {% if messages %}
-                                    {% for category, message in messages %}
-                                        <p class="{{ category }}">{{ message }}</p>
-                                    {% endfor %}
-                                {% endif %}
-                            {% endwith %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <p class="{{ category }}">{{ message }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
                         <form action="{{ url_for('customers.login') }} " method="post" class="billing-form">
-                            <h3 class="mb-4 billing-heading">Login!</h3>
+                            <h3 class="ion-ios-log-in mb-4 billing-heading"> Login!</h3>
                             <div class="row align-items-end">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="phone-number">Phone Number</label>
-                                        <input type="text" name="phone-number" class="form-control" placeholder="+260"
-                                               required>
+                                        <input type="text" name="phone-number" class="form-control" required>
                                     </div>
                                 </div>
-
-                                <div class="w-100"></div>
 
                                 <div class="w-100"></div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="enter-password">Enter Password</label>
-                                        <input type="password" name="enter-password" class="form-control"
-                                               placeholder="Password" required>
+                                        <input type="password" name="enter-password" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="w-100"></div>
@@ -48,14 +43,12 @@
                         <div class="w-100"></div>
                         <br>
                         <div>
-                            <a type="submit" href="{{ url_for('customers.customer_password_reset') }}" class="col-md-12 btn btn-outline-secondary py-3 px-4">Reset Password</a>
+                            <a type="submit" href="{{ url_for('customers.customer_password_reset') }}"
+                               class="col-md-12 btn btn-outline-secondary py-3 px-4">Reset Password</a>
                         </div>
-
                     </div>
                 </div>
             </div>
-
         {% endblock %}
     </section>
-
 {% endblock %}

@@ -30,7 +30,7 @@ def login():
 
         # setupUserSession(customer)
         # return redirect(url_for('products'))
-        return redirect(previous_page) if previous_page else redirect(url_for('customers.account'))
+        return redirect(previous_page) if previous_page else redirect(url_for('main.products'))
 
     return render_template('login.html')
 
@@ -294,12 +294,12 @@ def customer_password_reset():
             else:
                 flash("Passwords must be at least 10 characters and match. Please choose a strong password.",
                       "alert-danger")
-                return redirect(url_for("customer_password_reset"))
+                return redirect(url_for(".customer_password_reset"))
         else:
             flash("Cannot reset password at the moment. Please contact us for help.", "alert-danger")
-            return redirect(url_for("customer_password_reset"))
+            return redirect(url_for(".customer_password_reset"))
 
         flash("Your password has been successfully reset. Use new password to log in", "alert-info")
-        return redirect(url_for("login"))
+        return redirect(url_for(".login"))
 
     return render_template('password_reset.html')
