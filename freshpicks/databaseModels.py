@@ -1,7 +1,8 @@
 import datetime
 
-from freshpicks import db, login_manager
 from flask_login import UserMixin
+
+from freshpicks import login_manager, db
 
 
 @login_manager.user_loader

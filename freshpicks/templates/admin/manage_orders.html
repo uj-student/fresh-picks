@@ -106,7 +106,7 @@
                                             {% if page_num %}
                                                 {% if orders_list.page == page_num %}
                                                     <li class="active"
-                                                        href="{{ url_for('admin_view', view=order_type, page=page_num) }}">
+                                                        href="{{ url_for('.admin_view', view=order_type, page=page_num) }}">
                                                         <span>{{ page_num }}</span></li>
                                                 {% else %}
                                                     <li>

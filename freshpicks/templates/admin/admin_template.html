@@ -57,7 +57,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
     <div class="container">
-        <a class="navbar-brand" href="{{ url_for('home') }}">{% block navbar %}{% endblock %}</a>
+        <a class="navbar-brand" href="{{ url_for('main.home') }}">{% block navbar %}{% endblock %}</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav"
                 aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="oi oi-menu"></span> Menu
@@ -69,13 +69,13 @@
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">Orders</a>
                     <div class="dropdown-menu" aria-labelledby="dropdown04">
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="all_orders") }}">
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="all_orders") }}">
                             All Orders
                         </a>
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="pending_orders") }}">
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="pending_orders") }}">
                             Pending Orders
                         </a>
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="completed_orders") }}">
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="completed_orders") }}">
                             Complete Orders
                         </a>
                     </div>
@@ -84,15 +84,15 @@
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">Users</a>
                     <div class="dropdown-menu" aria-labelledby="dropdown04">
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="customers") }}">Customers</a>
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="admin_users") }}">Admin Users</a>
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="customers") }}">Customers</a>
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="admin_users") }}">Admin Users</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">Products</a>
                     <div class="dropdown-menu" aria-labelledby="dropdown04">
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="products") }}">Products</a>
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="products") }}">Products</a>
                     </div>
                 </li>
 
@@ -100,7 +100,7 @@
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">Other</a>
                     <div class="dropdown-menu" aria-labelledby="dropdown04">
-                        <a class="dropdown-item" href="{{ url_for('admin_view', view="customer_messages") }}">Customer Messages</a>
+                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="customer_messages") }}">Customer Messages</a>
                     </div>
                 </li>
                 {% if g.admin %}
@@ -108,12 +108,12 @@
                         <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                            aria-haspopup="true" aria-expanded="false">{{ session['name'] }}</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown04">
-                            <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                            <a class="dropdown-item" href="{{ url_for('main.logout') }}">Logout</a>
                             <a class="dropdown-item" href="{{ url_for('account') }}">My Profile</a>
                         </div>
                     </li>
                 {% else: %}
-                    <li class="nav-item"><a href="{{ url_for('login') }}" class="nav-link">Login</a></li>
+                    <li class="nav-item"><a href="{{ url_for('admins.admin') }}" class="nav-link">Login</a></li>
                 {% endif %}
 
             </ul>

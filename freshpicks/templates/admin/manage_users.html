@@ -9,7 +9,7 @@
                     <div class="cart-list">
                         <div class="row">
                             <div class="col-md-2">
-                                <form action="{{ url_for('admin_view', view='customers') }}">
+                                <form action="{{ url_for('.admin_view', view='customers') }}">
                                     <select class="dropdown-toggle" name="_manage_users"
                                             data-toggle="dropdown" aria-haspopup="true"
                                             onchange="this.form.submit()">
@@ -19,7 +19,7 @@
                                 </form>
                             </div>
                             <div>
-                                <a type="submit" class="btn btn-primary" href="{{ url_for('add_admin_user') }}">Add
+                                <a type="submit" class="btn btn-primary" href="{{ url_for('.add_admin_user') }}">Add
                                     Admin +</a>
                             </div>
                         </div>
@@ -40,7 +40,7 @@
                             {% if admin_list %}
                                 {% for admin in admin_list.items %}
                                     <tr class="text-center">
-                                        <form action="/mark_complete" method="post">
+                                        <form action="{{ url_for('.mark_complete') }}" method="post">
                                             <td class="total">
                                                 <h6>{{ admin.id }}</h6>
                                             </td>
@@ -95,16 +95,16 @@
                                             {% if page_num %}
                                                 {% if admin_list.page == page_num %}
                                                     <li class="active"
-                                                        href="{{ url_for('admin_view', view='admin_users', page=page_num) }}">
+                                                        href="{{ url_for('.admin_view', view='admin_users', page=page_num) }}">
                                                         <span>{{ page_num }}</span></li>
                                                 {% else %}
                                                     <li>
-                                                        <a href="{{ url_for('admin_view', view='admin_users', page=page_num) }}">{{ page_num }}</a>
+                                                        <a href="{{ url_for('.admin_view', view='admin_users', page=page_num) }}">{{ page_num }}</a>
                                                     </li>
                                                 {% endif %}
                                             {% else %}
                                                 <li>
-                                                    <a href="{{ url_for('admin_view', view='admin_users', page=right_edge) }}">...</a>
+                                                    <a href="{{ url_for('.admin_view', view='admin_users', page=right_edge) }}">...</a>
                                                 </li>
 
                                             {% endif %}

@@ -17,7 +17,7 @@
                                     {% endfor %}
                                 {% endif %}
                             {% endwith %}
-                        <form action="/login" method="post" class="billing-form">
+                        <form action="{{ url_for('customers.login') }} " method="post" class="billing-form">
                             <h3 class="mb-4 billing-heading">Login!</h3>
                             <div class="row align-items-end">
                                 <div class="col-md-12">
@@ -48,7 +48,7 @@
                         <div class="w-100"></div>
                         <br>
                         <div>
-                            <a type="submit" href="{{ url_for('customer_password_reset') }}" class="col-md-12 btn btn-outline-secondary py-3 px-4">Reset Password</a>
+                            <a type="submit" href="{{ url_for('customers.customer_password_reset') }}" class="col-md-12 btn btn-outline-secondary py-3 px-4">Reset Password</a>
                         </div>
 
                     </div>
