@@ -8,7 +8,7 @@
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-xl-7 ftco-animate">
-                        <form action="{{ url_for('app.add_admin_user') }}" method="post" class="billing-form">
+                        <form action="{{ url_for('.add_admin_user') }}" method="post" class="billing-form">
                             {% with messages = get_flashed_messages(with_categories=true) %}
                                 {% if messages %}
                                     <ul class="flash">
@@ -44,8 +44,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="phone-number">Phone Number</label>
-                                        <input type="number" class="form-control" name="phone-number" placeholder="+260"
-                                               required>
+                                        <input type="number" class="form-control" name="phone-number" required>
                                     </div>
                                 </div>
 

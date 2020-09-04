@@ -12,25 +12,25 @@ customers = Blueprint('customers', __name__)
 @customers.route('/login', methods=['GET', "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     if request.method == 'POST':
         req = request.form
 
         customer = Customers.query.filter_by(phone_number=req['phone-number']).first()
         if not customer:
             flash("Account could not be found. Have you registered?", "alert-warning")
-            return redirect(url_for('login'))
+            return redirect(url_for('customers.login'))
         else:
             if not check_password_hash(customer.password, req['enter-password']):
                 flash("Incorrect Password", "alert-danger")
-                return redirect(url_for('login'))
+                return redirect(url_for('customers.login'))
 
         login_user(customer)
         previous_page = request.args.get('next')
 
         # setupUserSession(customer)
         # return redirect(url_for('products'))
-        return redirect(previous_page) if previous_page else redirect(url_for('account'))
+        return redirect(previous_page) if previous_page else redirect(url_for('customers.account'))
 
     return render_template('login.html')
 
@@ -51,7 +51,7 @@ def setupUserSession(user_profile):
 @customers.route('/sign-up', methods=['GET', 'POST'])
 def signup():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     if request.method == 'POST':
         req = request.form
 
@@ -76,25 +76,24 @@ def signup():
             phone_number=str(req['phone-number']).replace(" ", "")).first()
         if existing_phone_number:
             flash("Phone number already registered!", "alert-danger")
-            return redirect(url_for('signup'))
+            return redirect(url_for('customers.signup'))
         if req['email-address']:
             existing_email_address = Customers.query.filter_by(
                 phone_number=str(req['email-address']).replace(" ", "")).first()
             if existing_email_address:
                 flash("Email already registered!", "alert-danger")
-                return redirect(url_for('signup'))
+                return redirect(url_for('customers.signup'))
 
         try:
             db.session.add(customer)
             db.session.commit()
         except Exception:
             flash("Could not create account. Please try later, or call us.", "alert-danger")
-            return redirect(url_for('signup'))
+            return redirect(url_for('customers.signup'))
 
         flash(f"Hi {customer.fullname}, thanks for signing up. Please login in to start shopping. Enjoy!",
               "alert-success")
-
-        return redirect(url_for('login'))
+        return redirect(url_for('customers.login'))
     return render_template('sign-up.html')
 
 
@@ -119,7 +118,7 @@ def account():
                 user_profile.phone_number = phone
             else:
                 flash("Phone Number already in use.", "alert-info")
-                return redirect(url_for('account'))
+                return redirect(url_for('customers.account'))
 
         if email and email != current_user.email_address:
             check_for_email = Customers.query.filter_by(email_address=current_user.email_address).first()
@@ -127,7 +126,7 @@ def account():
                 user_profile.email_address = email
             else:
                 flash("Email address already in use.", "alert-info")
-                return redirect(url_for('account'))
+                return redirect(url_for('customers.account'))
 
         if req['full-name'] != current_user.fullname:
             user_profile.fullname = req['full-name']
@@ -148,7 +147,7 @@ def account():
         # login_user(user_profile)
         # setupUserSession(user_profile)
         flash("Details updated successfully", "alert-info")
-        return redirect(url_for('account'))
+        return redirect(url_for('customers.account'))
     return render_template('account.html')
 
 
@@ -197,7 +196,7 @@ def add_product_to_cart():
 
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
-    return redirect(url_for('products'))
+    return redirect(url_for('main.products'))
 
 
 def array_merge(first_array, second_array):
@@ -233,7 +232,7 @@ def remove_product_from_cart(name):
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
 
-    return redirect(url_for('cart'))
+    return redirect(url_for('customers.cart'))
 
 
 def clear_cart():
@@ -272,27 +271,6 @@ def process_order():
             flash("Your order has been received.")
             clear_cart()
     return render_template('cart.html')
-
-
-@customers.route('/send_us_message', methods=['POST', 'GET'])
-def send_comment():
-    if request.method == 'POST':
-        form = request.form
-        comment = Messages(
-            name=form['contact-name'],
-            phone_number=form['contact-phone'],
-            email_address=form['contact-email'],
-            subject=form['contact-subject'],
-            message=form['contact-message']
-        )
-        try:
-            db.session.add(comment)
-            db.session.commit()
-            flash("Thank you for your message. We will get back to you as soon as we can.", "alert-info")
-        except Exception as error:
-            print(error)
-            flash("Sorry, could not send message. Please try again later or call us", "alert-warning")
-    return redirect(url_for('contact'))
 
 
 @customers.route('/reset_password', methods=['POST', 'GET'])

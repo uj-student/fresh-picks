@@ -15,7 +15,7 @@ PER_PAGE_VIEW =10
 @admins.route('/admin', methods=['GET', "POST"])
 def admin():
     if g.admins:
-        return redirect(url_for('admin_view', view='all_orders'))
+        return redirect(url_for('.admin_view', view='all_orders'))
     if request.method == 'POST':
         req = request.form
 
@@ -29,14 +29,14 @@ def admin():
                 return render_template('admin/admin_login.html')
 
         setupAdminSession(user_profile)
-        return redirect(url_for('admin_view', view='all_orders'))
+        return redirect(url_for('.admin_view', view='all_orders'))
     return render_template('admin/admin_login.html')
 
 
 @admins.route('/admin/<path:view>')
 def admin_view(view):
     if not g.admins:
-        return redirect(url_for('admins.admin'))
+        return redirect(url_for('.admins.admin'))
     page = request.args.get('page', 1, type=int)
 
     if "orders" in view:
@@ -73,7 +73,7 @@ def admin_view(view):
 @admins.route('/admin/mark_complete', methods=['POST'])
 def mark_complete():
     if not g.admins:
-        return redirect(url_for('admin'))
+        return redirect(url_for('.admin'))
     if request.method == 'POST':
         new_status = request.form['_order_status']
         current_status = request.form['_current_status']
@@ -85,13 +85,13 @@ def mark_complete():
             db.session.commit()
         except Exception as error:
             pass
-    return redirect(url_for('admin_view', view="pending_orders"))
+    return redirect(url_for('.admin_view', view="pending_orders"))
 
 
 @admins.route('/admin/remove/<int:product_id>')
 def toggle_product_display(product_id):
     if not g.admins:
-        return redirect(url_for('admin'))
+        return redirect(url_for('.admin'))
 
     product = Products.query.filter_by(id=product_id).first()
     display_status = product.is_displayed
@@ -102,13 +102,13 @@ def toggle_product_display(product_id):
         product.is_displayed = True
 
     db.session.commit()
-    return redirect((url_for('admin_view', view="products")))
+    return redirect((url_for('.admin_view', view="products")))
 
 
 @admins.route('/admin/products/add', methods=['POST', 'GET'])
 def add_product():
     if not g.admins:
-        return redirect(url_for('admin'))
+        return redirect(url_for('.admin'))
     if request.method == "POST":
         req = request.form
         image_location = upload_picture(request.files['display-image'])
@@ -125,10 +125,10 @@ def add_product():
             db.session.commit()
         except Exception as error:
             flash(f"Could not add product. \nReason: {error}", "alert-danger")
-            return redirect(url_for("add_product"))
+            return redirect(url_for(".add_product"))
 
         flash(f"{new_product.name} added successfully.", "alert-success")
-        return redirect(url_for('add_product'))
+        return redirect(url_for('.add_product'))
     return render_template('admin/add_products.html')
 
 
@@ -159,7 +159,7 @@ def add_admin_user():
         if len(req['password']) < 10:
             flash("Password must be at least 10 characters. Please choose a strong password.", "alert-danger")
             # return render_template('admin/admin_register.html')
-            return redirect(url_for("add_admin_user"))
+            return redirect(url_for(".add_admin_user"))
 
         if req['password'] != req['confirm-password']:
             flash("Ensure that passwords are the same. Please try again.", "alert-danger")
@@ -181,11 +181,11 @@ def add_admin_user():
             db.session.commit()
         except Exception as error:
             flash(f"Could not create account. \nReason: {error}", "alert-danger")
-            return redirect(url_for("add_admin_user"))
+            return redirect(url_for(".add_admin_user"))
 
         flash(f"{admin_account.username}'s account has been created successfully!", "alert-success")
 
-        return redirect(url_for("add_admin_user"))
+        return redirect(url_for(".add_admin_user"))
     return render_template('admin/admin_register.html')
 
 
@@ -196,7 +196,7 @@ def password_reset(customer_id):
     db.session.commit()
     flash(f"{customer.fullname.split(' ')[0]}'s password has been reset. \nPlease inform them to set a new password.",
           "alert-info")
-    return redirect(url_for('admin_view', view='customers'))
+    return redirect(url_for('.admin_view', view='customers'))
 
 def setupAdminSession(adminUser):
     session.clear()

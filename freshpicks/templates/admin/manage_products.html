@@ -9,7 +9,7 @@
                     <div class="cart-list">
 
                         <div>
-                            <a type="button" class="col-md-2 btn btn-primary" href="{{ url_for('add_product') }}">
+                            <a type="button" class="col-md-2 btn btn-primary" href="{{ url_for('.add_product') }}">
                                 Add Product +
                             </a>
                         </div>
@@ -47,7 +47,7 @@
                                         </td>
 
                                         <td class="product-category">
-                                            <a href="{{ url_for('toggle_product_display', product_id=item.id) }}"
+                                            <a href="{{ url_for('.toggle_product_display', product_id=item.id) }}"
                                                class="alert-link">
                                                 {% if  item.is_displayed %}
                                                     <h6>{{ "Yes" }}</h6>
@@ -73,16 +73,16 @@
                                             {% if page_num %}
                                                 {% if product_list.page == page_num %}
                                                     <li class="active"
-                                                        href="{{ url_for('admin_view', view='products', page=page_num) }}">
+                                                        href="{{ url_for('.admin_view', view='products', page=page_num) }}">
                                                         <span>{{ page_num }}</span></li>
                                                 {% else %}
                                                     <li>
-                                                        <a href="{{ url_for('admin_view', view='products', page=page_num) }}">{{ page_num }}</a>
+                                                        <a href="{{ url_for('.admin_view', view='products', page=page_num) }}">{{ page_num }}</a>
                                                     </li>
                                                 {% endif %}
                                             {% else %}
                                                 <li>
-                                                    <a href="{{ url_for('admin_view', view='products', page=right_edge) }}">...</a>
+                                                    <a href="{{ url_for('.admin_view', view='products', page=right_edge) }}">...</a>
                                                 </li>
 
                                             {% endif %}
@@ -93,8 +93,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
