@@ -209,7 +209,6 @@ def setupAdminSession(adminUser):
 
 @admins.before_request
 def before_request():
-    g.user = None
     g.admins = None
 
     if 'admin_username' in session:
