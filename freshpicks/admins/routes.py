@@ -1,8 +1,8 @@
+import datetime
 import os
 import time
+
 from PIL import Image
-
-
 from flask import Blueprint, g, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -10,7 +10,8 @@ from freshpicks import db
 from freshpicks.databaseModels import AdminUsers, Orders, Customers, Products, Messages
 
 admins = Blueprint('admins', __name__)
-PER_PAGE_VIEW =10
+PER_PAGE_VIEW = 10
+
 
 @admins.route('/admin', methods=['GET', "POST"])
 def admin():
@@ -36,7 +37,7 @@ def admin():
 @admins.route('/admin/<path:view>')
 def admin_view(view):
     if not g.admins:
-        return redirect(url_for('.admins.admin'))
+        return redirect(url_for('.admin'))
     page = request.args.get('page', 1, type=int)
 
     if "orders" in view:
@@ -65,8 +66,9 @@ def admin_view(view):
             per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_products.html', product_list=product_list)
     elif view == "customer_messages":
-        messages_list = Messages.query.order_by(Messages.date_sent.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
-        return render_template('admin/manage_comments.html', messages_list=messages_list)
+        status = request.args.get('msg_status') if request.args.get('msg_status') else 'open'
+        messages = Messages.query.filter_by(status=status).order_by(Messages.date_sent.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
+        return render_template('admin/manage_comments.html', msg_status=status, messages_list=messages)
     return render_template('admin/manage_products.html', product_list=[])
 
 
@@ -198,6 +200,7 @@ def password_reset(customer_id):
           "alert-info")
     return redirect(url_for('.admin_view', view='customers'))
 
+
 def setupAdminSession(adminUser):
     session.clear()
     session['admin_username'] = adminUser.username
@@ -206,8 +209,19 @@ def setupAdminSession(adminUser):
 
 @admins.before_request
 def before_request():
-    g.user = None
     g.admins = None
 
     if 'admin_username' in session:
         g.admins = session['admin_username']
+
+
+@admins.route('/mark_comment_complete/<int:comment_id>', methods=['POST'])
+def update_message(comment_id):
+    if request.method == 'POST':
+        comment = Messages.query.filter_by(id=comment_id).first()
+        comment.status = 'closed'
+        comment.date_updated = datetime.datetime.now()
+        db.session.commit()
+        flash(f"Message from {comment.name} has been closed.", "alert-info")
+        return redirect(url_for('.admin_view', view='customer_messages'))
+    return render_template('manage_comments.html')
