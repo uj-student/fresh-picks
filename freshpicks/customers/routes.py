@@ -241,7 +241,6 @@ def process_order():
         if 'my_cart' in session:
             content = ""
             for k, v in session['my_cart'].items():
-                print(f"Order: {v[0]}")
                 content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
 
             order_address = f"{req['delivery-address']}, {req['town']}" if req[

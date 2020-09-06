@@ -34,10 +34,6 @@ def admin():
 
 @admins.route('/admin/<path:view>')
 def admin_view(view):
-    print(Products.query.all())
-    # box = Products.query.first()
-    # box.image_location = '/static/images/fruit-box.jpg'
-
     if not g.admins:
         return redirect(url_for('.admin'))
     page = request.args.get('page', 1, type=int)
