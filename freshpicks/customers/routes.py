@@ -21,6 +21,9 @@ def login():
             flash("Account could not be found. Have you registered?", "alert-warning")
             return redirect(url_for('customers.login'))
         else:
+            if not customer.password:
+                flash("Please set a new password.", "alert-warning")
+                return redirect(url_for('.customer_password_reset'))
             if not check_password_hash(customer.password, req['enter-password']):
                 flash("Incorrect Password", "alert-danger")
                 return redirect(url_for('customers.login'))

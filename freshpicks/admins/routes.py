@@ -87,6 +87,7 @@ def mark_complete():
         try:
             my_order.status = new_status
             db.session.commit()
+            flash(f"{my_order.buyer.fullname}'s order has been updated.", "alert-info")
         except Exception as error:
             pass
     return redirect(url_for('.admin_view', view="pending_orders"))
@@ -141,7 +142,7 @@ def add_product():
 @admins.route('/admin/users/add', methods=['POST', 'GET'])
 def add_admin_user():
     if not g.admins:
-        return redirect(url_for('admin'))
+        return redirect(url_for('.admin'))
     if request.method == "POST":
         req = request.form
 

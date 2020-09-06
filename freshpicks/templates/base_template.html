@@ -94,6 +94,7 @@
                             class="icon-shopping_cart"></span>{{ session['total_quantity'] }}</a></li>
                 {% else: %}
                     <li class="nav-item"><a href="{{ url_for('customers.login') }}" class="nav-link">Login</a></li>
+                    <li class="nav-item"><a href="{{ url_for('customers.signup') }}" class="nav-link">Sign Up</a></li>
                 {% endif %}
 
             </ul>
