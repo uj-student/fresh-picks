@@ -1,10 +1,9 @@
-
 from flask import render_template, request, redirect, session, url_for, flash, Blueprint
 from flask_login import login_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from freshpicks import FreshPicksUtilities, db
-from freshpicks.databaseModels import Customers, Orders, Messages
+from freshpicks.databaseModels import Customers, Orders
 
 customers = Blueprint('customers', __name__)
 
@@ -21,31 +20,18 @@ def login():
             flash("Account could not be found. Have you registered?", "alert-warning")
             return redirect(url_for('customers.login'))
         else:
+            if not customer.password:
+                flash("Please set a new password.", "alert-warning")
+                return redirect(url_for('.customer_password_reset'))
             if not check_password_hash(customer.password, req['enter-password']):
                 flash("Incorrect Password", "alert-danger")
                 return redirect(url_for('customers.login'))
 
         login_user(customer)
         previous_page = request.args.get('next')
-
-        # setupUserSession(customer)
-        # return redirect(url_for('products'))
         return redirect(previous_page) if previous_page else redirect(url_for('main.products'))
 
     return render_template('login.html')
-
-
-def setupUserSession(user_profile):
-    session.clear()
-    session['user_id'] = user_profile.id
-    session['user_first_name'] = user_profile.fullname.split(' ')[0]
-    session['user_name'] = user_profile.fullname
-    session['user_address'] = user_profile.address
-    session['user_town'] = user_profile.town
-    session['user_phone'] = user_profile.phone_number
-    session['user_email'] = user_profile.email_address
-    session['user_gender'] = user_profile.gender
-    session['user_dob'] = user_profile.dob
 
 
 @customers.route('/sign-up', methods=['GET', 'POST'])
@@ -156,6 +142,7 @@ def account():
 def cart():
     return render_template('cart.html')
 
+
 @customers.route('/add', methods=['POST'])
 @login_required
 def add_product_to_cart():
@@ -254,13 +241,12 @@ def process_order():
         if 'my_cart' in session:
             content = ""
             for k, v in session['my_cart'].items():
-                print(f"Order: {v[0]}")
                 content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
 
-            order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
-                'user_address']
+            order_address = f"{req['delivery-address']}, {req['town']}" if req[
+                'delivery-address'] else current_user.address
 
-            my_order = Orders(customer_id=session['user_id'],
+            my_order = Orders(customer_id=current_user.id,
                               order=content,
                               total_price=session['total_price'],
                               delivery_address=order_address,

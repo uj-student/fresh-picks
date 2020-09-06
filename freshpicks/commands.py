@@ -7,3 +7,6 @@ from flask.cli import with_appcontext
 def create_tables():
     from freshpicks import db
     db.create_all()
+
+# db.session.remove()
+# db.drop_all()

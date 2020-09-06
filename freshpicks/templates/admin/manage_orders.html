@@ -44,7 +44,7 @@
                             {% if orders_list %}
                                 {% for order in orders_list.items %}
                                     <tr class="text-center">
-                                        <form action="/mark_complete" method="post">
+                                        <form action="{{ url_for('admins.mark_complete') }}" method="post">
 
                                             <td class="total">
                                                 <h6>{{ order.id }}</h6>

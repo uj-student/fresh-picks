@@ -1,12 +1,10 @@
 import datetime
-import os
-import time
 
-from PIL import Image
-from flask import Blueprint, g, render_template, redirect, url_for, request, flash, session
+from flask import Blueprint, g, render_template, redirect, url_for, request, flash, session, app
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from freshpicks import db
+from freshpicks.FreshPicksUtilities import upload_picture
 from freshpicks.databaseModels import AdminUsers, Orders, Customers, Products, Messages
 
 admins = Blueprint('admins', __name__)
@@ -41,7 +39,7 @@ def admin_view(view):
     page = request.args.get('page', 1, type=int)
 
     if "orders" in view:
-        orders = ""  # need this to handle the filter in the view
+        orders = ""  # need this to handle the filter the orders  in the view
         order_type = "all_orders"
         if view == "pending_orders":
             orders = Orders.query.filter_by(status="pending").paginate(per_page=PER_PAGE_VIEW, page=page)
@@ -85,6 +83,7 @@ def mark_complete():
         try:
             my_order.status = new_status
             db.session.commit()
+            flash(f"{my_order.buyer.fullname}'s order has been updated.", "alert-info")
         except Exception as error:
             pass
     return redirect(url_for('.admin_view', view="pending_orders"))
@@ -118,7 +117,7 @@ def add_product():
             name=req['product-name'],
             description=req['product-description'],
             price=req['price'],
-            image_location=f"/{image_location}",
+            image_location=image_location,
             is_basket_item=False if req['type'] == "extra" else True,
             is_displayed=True if req['display'] == "yes" else False
         )
@@ -134,22 +133,12 @@ def add_product():
     return render_template('admin/add_products.html')
 
 
-def upload_picture(uploaded_picture):
-    f_name, f_ext = os.path.splitext(uploaded_picture.filename)
-    image_name = f_name + str(round(time.time())) + f_ext
-    # image_path = os.path.join(app.root_path, 'static/images', image_name)
-    image_path = 'static/images/' + image_name
-    resize = (300, 300)
-    resize_image = Image.open(uploaded_picture)
-    resize_image.thumbnail(resize)
-    resize_image.save(image_path)
-    return image_path
 
 
 @admins.route('/admin/users/add', methods=['POST', 'GET'])
 def add_admin_user():
     if not g.admins:
-        return redirect(url_for('admin'))
+        return redirect(url_for('.admin'))
     if request.method == "POST":
         req = request.form
 

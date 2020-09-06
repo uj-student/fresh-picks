@@ -72,4 +72,4 @@ def send_comment():
         except Exception as error:
             print(error)
             flash("Sorry, could not send message. Please try again later or call us", "alert-warning")
-    return redirect(url_for('contact'))
+    return redirect(url_for('.contact'))
