@@ -257,10 +257,9 @@ def process_order():
                 print(f"Order: {v[0]}")
                 content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
 
-            order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else session[
-                'user_address']
+            order_address = f"{req['delivery-address']}, {req['town']}" if req['delivery-address'] else current_user.address
 
-            my_order = Orders(customer_id=session['user_id'],
+            my_order = Orders(customer_id=current_user.id,
                               order=content,
                               total_price=session['total_price'],
                               delivery_address=order_address,
