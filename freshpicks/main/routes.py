@@ -42,16 +42,16 @@ def products():
         product_list = Products.query.filter_by(is_displayed=True)
     except Exception as error:
         print(error)
-    basket_display_list = []
+    box_display_list = []
     extras_display_list = []
 
     if product_list:
         for item in product_list:
-            if item.is_basket_item:
-                basket_display_list.append(item)
+            if item.is_box:
+                box_display_list.append(item)
             else:
                 extras_display_list.append(item)
-    return render_template('products.html', baskets=basket_display_list, extras=extras_display_list)
+    return render_template('products.html', boxes=box_display_list, extras=extras_display_list)
 
 
 @main.route('/send_us_message', methods=['POST', 'GET'])

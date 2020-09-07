@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Blueprint, g, render_template, redirect, url_for, request, flash, session, app
+from flask import Blueprint, g, render_template, redirect, url_for, request, flash, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from freshpicks import db
@@ -60,12 +60,13 @@ def admin_view(view):
         admin_list = AdminUsers.query.order_by(AdminUsers.username.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_users.html', admin_list=admin_list)
     elif view == "products":
-        product_list = Products.query.order_by(Products.is_basket_item.desc(), Products.name.asc()).paginate(
+        product_list = Products.query.order_by(Products.is_box.desc(), Products.name.asc()).paginate(
             per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_products.html', product_list=product_list)
     elif view == "customer_messages":
         status = request.args.get('msg_status') if request.args.get('msg_status') else 'open'
-        messages = Messages.query.filter_by(status=status).order_by(Messages.date_sent.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
+        messages = Messages.query.filter_by(status=status).order_by(Messages.date_sent.asc()).paginate(
+            per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_comments.html', msg_status=status, messages_list=messages)
     return render_template('admin/manage_products.html', product_list=[])
 
@@ -118,7 +119,7 @@ def add_product():
             description=req['product-description'],
             price=req['price'],
             image_location=image_location,
-            is_basket_item=False if req['type'] == "extra" else True,
+            is_box=False if req['type'] == "extra" else True,
             is_displayed=True if req['display'] == "yes" else False
         )
         try:
@@ -131,8 +132,6 @@ def add_product():
         flash(f"{new_product.name} added successfully.", "alert-success")
         return redirect(url_for('.add_product'))
     return render_template('admin/add_products.html')
-
-
 
 
 @admins.route('/admin/users/add', methods=['POST', 'GET'])
