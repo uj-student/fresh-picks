@@ -142,7 +142,6 @@ def account():
 def cart():
     return render_template('cart.html')
 
-
 @customers.route('/add', methods=['POST'])
 @login_required
 def add_product_to_cart():
@@ -155,7 +154,8 @@ def add_product_to_cart():
         image = req['p-image']
         session.modified = True
 
-        quantity = 1
+        quantity = req['quantity'] if 'quantity' in req else 1
+
         item_array = {
             name: [float(price), int(quantity), image]
         }
@@ -168,7 +168,7 @@ def add_product_to_cart():
             if name in session['my_cart']:
                 for k, v in session['my_cart'].items():
                     if k == name:
-                        t_quantity = v[1] + 1
+                        t_quantity = v[1] + int(quantity)
                 item_array = {
                     name: [float(price), int(t_quantity), image]
                 }
