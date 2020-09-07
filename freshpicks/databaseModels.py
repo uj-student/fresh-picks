@@ -55,12 +55,12 @@ class Products(db.Model):
     description = db.Column(db.String(), nullable=True)
     price = db.Column(db.Float(), nullable=False)
     image_location = db.Column(db.String(), unique=True, nullable=False)
-    is_basket_item = db.Column(db.Boolean(), default=False, nullable=False)
+    is_box = db.Column(db.Boolean(), default=False, nullable=False)
     is_displayed = db.Column(db.Boolean(), default=False, nullable=False)
 
     def __repr__(self):
         return f"Product('{self.id}', '{self.name}', '{self.description}', '{self.price}', '{self.image_location}', " \
-               f"'{self.is_basket_item}', {self.is_displayed})"
+               f"'{self.is_box}', {self.is_displayed})"
 
 
 class AdminUsers(db.Model, UserMixin):
