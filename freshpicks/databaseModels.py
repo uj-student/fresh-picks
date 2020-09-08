@@ -34,7 +34,8 @@ class Customers(db.Model, UserMixin):
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     customer_id = db.Column(db.Integer(), db.ForeignKey('customers.id'), nullable=False)
-    order = db.Column(db.String(), nullable=False)
+    cost_order = db.Column(db.String(), nullable=False)
+    customer_order = db.Column(db.String(), nullable=False)
     total_price = db.Column(db.Float(), nullable=False)
     delivery_address = db.Column(db.String(), nullable=False)
     date_ordered = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)
@@ -53,13 +54,14 @@ class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     name = db.Column(db.String(), unique=True, nullable=False)
     description = db.Column(db.String(), nullable=True)
-    price = db.Column(db.Float(), nullable=False)
+    sell_price = db.Column(db.Float(), nullable=False)
+    cost_price = db.Column(db.Float(), nullable=False)
     image_location = db.Column(db.String(), unique=True, nullable=False)
     is_box = db.Column(db.Boolean(), default=False, nullable=False)
     is_displayed = db.Column(db.Boolean(), default=False, nullable=False)
 
     def __repr__(self):
-        return f"Product('{self.id}', '{self.name}', '{self.description}', '{self.price}', '{self.image_location}', " \
+        return f"Product('{self.id}', '{self.name}', '{self.description}', '{self.sell_price}', '{self.image_location}', " \
                f"'{self.is_box}', {self.is_displayed})"
 
 

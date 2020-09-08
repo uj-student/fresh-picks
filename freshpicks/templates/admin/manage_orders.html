@@ -36,7 +36,7 @@
                                 <th>Order Details</th>
                                 <th>Delivery Address</th>
                                 <th>Order Placed on</th>
-                                <th>Amount(ZK)</th>
+                                <th>Amount Paid(ZK)</th>
                                 <th>Status</th>
                             </tr>
                             </thead>
@@ -57,7 +57,7 @@
                                             </td>
 
                                             <td class="product-name">
-                                                {% set _order = order.order.splitlines() %}
+                                                {% set _order = order.cost_order.splitlines() %}
                                                 {% for i in _order %}
                                                     <h6>{{ i }}</h6>
                                                 {% endfor %}

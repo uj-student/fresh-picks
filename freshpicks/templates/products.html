@@ -52,9 +52,9 @@
                                 </p>
                             </div>
                             <p class="price">
-                                <span name="product-price">ZK {{ "%.2f"|format(item.price) }}</span>
-                                <input type="hidden" name="p-price"
-                                       value="{{ "%.2f"|format(item.price) }}"/>
+                                <span name="product-price">ZK {{ "%.2f"|format(item.sell_price) }}</span>
+                                <input type="hidden" name="sell_price"
+                                       value="{{ "%.2f"|format(item.sell_price) }}"/>
 
                             </p>
                             <p>{{ item.description }} </p>
@@ -108,9 +108,9 @@
                                     <div class="pricing">
                                         {#<p class="price"><span class="mr-2 price-dc">$120.00</span><span class="price-sale">$80.00</span></p>#}
                                         <p class="price"><span
-                                                class="price-sale">ZK{{ "%.2f"|format(item.price) }}</span>
-                                            <input type="hidden" name="p-price"
-                                                   value="{{ "%.2f"|format(item.price) }}"/>
+                                                class="price-sale">ZK{{ "%.2f"|format(item.sell_price) }}</span>
+                                            <input type="hidden" name="sell_price"
+                                                   value="{{ "%.2f"|format(item.sell_price) }}"/>
                                         </p>
                                     </div>
                                 </div>

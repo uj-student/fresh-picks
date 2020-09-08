@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from freshpicks import FreshPicksUtilities, db
-from freshpicks.databaseModels import Customers, Orders
+from freshpicks.databaseModels import Customers, Orders, Products
 
 customers = Blueprint('customers', __name__)
 
@@ -150,14 +150,16 @@ def add_product_to_cart():
         total_price = 0
         req = request.form
         name = req['p-name']
-        price = req['p-price']
+        cost_price = Products.query.filter_by(name=name).first().cost_price
+        print(f"cost_price: {cost_price}")
+        sell_price = req['sell_price']
         image = req['p-image']
         session.modified = True
 
         quantity = req['quantity'] if 'quantity' in req else 1
 
         item_array = {
-            name: [float(price), int(quantity), image]
+            name: [float(cost_price), float(sell_price), int(quantity), image]
         }
 
         if 'my_cart' not in session:
@@ -168,9 +170,9 @@ def add_product_to_cart():
             if name in session['my_cart']:
                 for k, v in session['my_cart'].items():
                     if k == name:
-                        t_quantity = v[1] + int(quantity)
+                        t_quantity = v[2] + int(quantity)
                 item_array = {
-                    name: [float(price), int(t_quantity), image]
+                    name: [float(cost_price), float(sell_price), int(t_quantity), image]
                 }
                 session['my_cart'] = array_merge(session['my_cart'], item_array)
             else:
@@ -178,8 +180,8 @@ def add_product_to_cart():
                 total_quantity += t_quantity
 
         for k, v in session['my_cart'].items():
-            total_quantity += v[1]
-            total_price += (v[0] * v[1])
+            total_quantity += v[2]
+            total_price += (v[1] * v[2])
 
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
@@ -208,9 +210,9 @@ def remove_product_from_cart(name):
             if 'my_cart' in session:
                 for k, v in session['my_cart'].items():
                     quantity = int(v[1])
-                    price = float(v[0])
+                    sell_price = float(v[0])
                     total_quantity += quantity
-                    total_price += price
+                    total_price += sell_price
             break
 
     if total_quantity < 1:
@@ -239,15 +241,18 @@ def process_order():
     if request.method == "POST":
         req = request.form
         if 'my_cart' in session:
-            content = ""
+            customer_order = ""
+            cost_order=""
             for k, v in session['my_cart'].items():
-                content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
+                customer_order += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[1])} x {v[2]}\n"
+                cost_order += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[2]}\n"
 
             order_address = f"{req['delivery-address']}, {req['town']}" if req[
                 'delivery-address'] else current_user.address
 
             my_order = Orders(customer_id=current_user.id,
-                              order=content,
+                              customer_order=customer_order,
+                              cost_order=cost_order,
                               total_price=session['total_price'],
                               delivery_address=order_address,
                               additional_instructions=req['instructions'])
