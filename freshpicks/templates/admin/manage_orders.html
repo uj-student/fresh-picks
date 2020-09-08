@@ -36,7 +36,8 @@
                                 <th>Order Details</th>
                                 <th>Delivery Address</th>
                                 <th>Order Placed on</th>
-                                <th>Amount(ZK)</th>
+                                <th>Cost Price(ZK)</th>
+                                <th>Amount Paid(ZK)</th>
                                 <th>Status</th>
                             </tr>
                             </thead>
@@ -72,6 +73,10 @@
 
                                             <td class="categories">
                                                 <h6>{{ order.date_ordered.strftime('%Y-%m-%d %H:%M:%S') }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ "%.2f"|format(order.total_price) }}</h6>
                                             </td>
 
                                             <td class="categories">

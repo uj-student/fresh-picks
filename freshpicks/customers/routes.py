@@ -148,16 +148,18 @@ def add_product_to_cart():
     if request.method == 'POST':
         total_quantity = 0
         total_price = 0
+        total_cost_price = 0
         req = request.form
         name = req['p-name']
-        price = req['p-price']
+        cost_price = req['cost_price']
+        sell_price = req['sell_price']
         image = req['p-image']
         session.modified = True
 
         quantity = req['quantity'] if 'quantity' in req else 1
 
         item_array = {
-            name: [float(price), int(quantity), image]
+            name: [float(cost_price), float(sell_price), int(quantity), image]
         }
 
         if 'my_cart' not in session:
@@ -168,9 +170,9 @@ def add_product_to_cart():
             if name in session['my_cart']:
                 for k, v in session['my_cart'].items():
                     if k == name:
-                        t_quantity = v[1] + int(quantity)
+                        t_quantity = v[2] + int(quantity)
                 item_array = {
-                    name: [float(price), int(t_quantity), image]
+                    name: [float(cost_price), float(sell_price), int(t_quantity), image]
                 }
                 session['my_cart'] = array_merge(session['my_cart'], item_array)
             else:
@@ -178,8 +180,8 @@ def add_product_to_cart():
                 total_quantity += t_quantity
 
         for k, v in session['my_cart'].items():
-            total_quantity += v[1]
-            total_price += (v[0] * v[1])
+            total_quantity += v[2]
+            total_price += (v[1] * v[2])
 
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
@@ -201,6 +203,7 @@ def array_merge(first_array, second_array):
 def remove_product_from_cart(name):
     total_price = 0
     total_quantity = 0
+    total_cost_price = 0
 
     for item in session.get('my_cart').items():
         if item[0] == name:
@@ -208,9 +211,9 @@ def remove_product_from_cart(name):
             if 'my_cart' in session:
                 for k, v in session['my_cart'].items():
                     quantity = int(v[1])
-                    price = float(v[0])
+                    sell_price = float(v[0])
                     total_quantity += quantity
-                    total_price += price
+                    total_price += sell_price
             break
 
     if total_quantity < 1:
@@ -218,6 +221,7 @@ def remove_product_from_cart(name):
     else:
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
+        session['total_cost_price'] = total_cost_price
 
     return redirect(url_for('customers.cart'))
 
@@ -248,6 +252,7 @@ def process_order():
 
             my_order = Orders(customer_id=current_user.id,
                               order=content,
+                              cost_price=session['total_cost_price'],
                               total_price=session['total_price'],
                               delivery_address=order_address,
                               additional_instructions=req['instructions'])

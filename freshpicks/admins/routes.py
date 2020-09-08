@@ -117,7 +117,8 @@ def add_product():
         new_product = Products(
             name=req['product-name'],
             description=req['product-description'],
-            price=req['price'],
+            cost_price=req['cost-price'],
+            sell_price=req['sell-price'],
             image_location=image_location,
             is_box=False if req['type'] == "extra" else True,
             is_displayed=True if req['display'] == "yes" else False
