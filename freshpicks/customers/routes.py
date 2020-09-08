@@ -250,8 +250,6 @@ def process_order():
             order_address = f"{req['delivery-address']}, {req['town']}" if req[
                 'delivery-address'] else current_user.address
 
-            # name: [float(cost_price), float(sell_price), int(quantity), image]
-
             my_order = Orders(customer_id=current_user.id,
                               customer_order=customer_order,
                               cost_order=cost_order,
