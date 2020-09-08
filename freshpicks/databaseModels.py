@@ -34,8 +34,8 @@ class Customers(db.Model, UserMixin):
 class Orders(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     customer_id = db.Column(db.Integer(), db.ForeignKey('customers.id'), nullable=False)
-    order = db.Column(db.String(), nullable=False)
-    cost_price = db.Column(db.Float(), nullable=False)
+    cost_order = db.Column(db.String(), nullable=False)
+    customer_order = db.Column(db.String(), nullable=False)
     total_price = db.Column(db.Float(), nullable=False)
     delivery_address = db.Column(db.String(), nullable=False)
     date_ordered = db.Column(db.TIMESTAMP(), default=datetime.datetime.now(), nullable=False)

@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from freshpicks import FreshPicksUtilities, db
-from freshpicks.databaseModels import Customers, Orders
+from freshpicks.databaseModels import Customers, Orders, Products
 
 customers = Blueprint('customers', __name__)
 
@@ -148,10 +148,10 @@ def add_product_to_cart():
     if request.method == 'POST':
         total_quantity = 0
         total_price = 0
-        total_cost_price = 0
         req = request.form
         name = req['p-name']
-        cost_price = req['cost_price']
+        cost_price = Products.query.filter_by(name=name).first().cost_price
+        print(f"cost_price: {cost_price}")
         sell_price = req['sell_price']
         image = req['p-image']
         session.modified = True
@@ -203,7 +203,6 @@ def array_merge(first_array, second_array):
 def remove_product_from_cart(name):
     total_price = 0
     total_quantity = 0
-    total_cost_price = 0
 
     for item in session.get('my_cart').items():
         if item[0] == name:
@@ -221,7 +220,6 @@ def remove_product_from_cart(name):
     else:
         session['total_quantity'] = total_quantity
         session['total_price'] = total_price
-        session['total_cost_price'] = total_cost_price
 
     return redirect(url_for('customers.cart'))
 
@@ -243,16 +241,20 @@ def process_order():
     if request.method == "POST":
         req = request.form
         if 'my_cart' in session:
-            content = ""
+            customer_order = ""
+            cost_order=""
             for k, v in session['my_cart'].items():
-                content += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[1]}\n"
+                customer_order += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[1])} x {v[2]}\n"
+                cost_order += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[2]}\n"
 
             order_address = f"{req['delivery-address']}, {req['town']}" if req[
                 'delivery-address'] else current_user.address
 
+            # name: [float(cost_price), float(sell_price), int(quantity), image]
+
             my_order = Orders(customer_id=current_user.id,
-                              order=content,
-                              cost_price=session['total_cost_price'],
+                              customer_order=customer_order,
+                              cost_order=cost_order,
                               total_price=session['total_price'],
                               delivery_address=order_address,
                               additional_instructions=req['instructions'])

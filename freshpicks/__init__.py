@@ -1,11 +1,10 @@
 from flask import Flask
-# from dotenv import load_dotenv
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
 from freshpicks.commands import create_tables
-
 db = SQLAlchemy()
+
 login_manager = LoginManager()
 
 login_manager.login_view = 'customers.login'
@@ -16,6 +15,7 @@ def create_app(config_file='settings.py'):
     app = Flask(__name__)
 
     app.config.from_pyfile(config_file)
+    # from dotenv import load_dotenv
     # load_dotenv(config_file)
 
     db.init_app(app)
