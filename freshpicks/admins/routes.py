@@ -134,6 +134,35 @@ def add_product():
         return redirect(url_for('.add_product'))
     return render_template('admin/add_products.html')
 
+@admins.route('/admin/products/edit/<int:product_id>', methods=['POST', 'GET'])
+def edit_product(product_id):
+    if not g.admins:
+        return redirect(url_for('.admin'))
+    product = Products.query.filter_by(id=product_id).first()
+
+    if request.method == "POST":
+        req = request.form
+        image_location = upload_picture(request.files['display-image'])
+        new_product = Products(
+            name=req['product-name'],
+            description=req['product-description'],
+            cost_price=req['cost-price'],
+            sell_price=req['sell-price'],
+            image_location=image_location,
+            is_box=False if req['type'] == "extra" else True,
+            is_displayed=True if req['display'] == "yes" else False
+        )
+        try:
+            db.session.add(new_product)
+            db.session.commit()
+        except Exception as error:
+            flash(f"Could not add product. \nReason: {error}", "alert-danger")
+            return redirect(url_for(".add_product"))
+
+        flash(f"{new_product.name} added successfully.", "alert-success")
+        return redirect(url_for('.add_product'))
+    return render_template('admin/add_products.html')
+
 
 @admins.route('/admin/users/add', methods=['POST', 'GET'])
 def add_admin_user():
