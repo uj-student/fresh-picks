@@ -91,7 +91,7 @@ def signup():
 @customers.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    my_order_history = get_my_orders()
+    recent_order = get_my_orders()[0] if get_my_orders() else []
 
     if request.method == "POST":
         req = request.form
@@ -134,7 +134,14 @@ def account():
 
         flash("Details updated successfully", "alert-info")
         return redirect(url_for('customers.account'))
-    return render_template('account.html', order_history = my_order_history)
+    return render_template('account.html', recent_order = recent_order)
+
+
+@customers.route('/account/order_history')
+@login_required
+def order_history():
+    my_order_history = get_my_orders()
+    return render_template('customer/view_order_history.html', order_history = my_order_history)
 
 
 def get_my_orders():
