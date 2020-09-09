@@ -30,12 +30,13 @@
                                 {% for item in product_list.items %}
                                     <tr class="text-center">
                                         <td class="image-prod">
-                                            <a href="{{ url_for('.edit_product', product_id=item.id) }}">
-                                            <div class="img"
-                                                 style="background-image:url({{ item.image_location }});">
-                                            </div>
-{#                                            <img src="{{ url_for('static', filename='images/fruit-box.jpg') }}"/>#}
-                                            <h6>{{ item.name }}</h6>
+                                            <a href="{{ url_for('.edit_product', product_id =item.id) }}"
+                                               class="alert-link">
+                                                <div class="img"
+                                                     style="background-image:url({{ item.image_location }});">
+                                                </div>
+                                                {# <img src="{{ url_for('static', filename='images/fruit-box.jpg') }}"/>#}
+                                                <h6>{{ item.name }}</h6>
                                             </a>
                                         </td>
                                         <td class="product-name">
@@ -77,26 +78,26 @@
                                 <div class="block-27">
                                     <ul>
                                         <li><a href="#">&lt;</a></li>
-                                    {% if product_list %}
-                                        {% for page_num in product_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-                                            {% if page_num %}
-                                                {% if product_list.page == page_num %}
-                                                    <li class="active"
-                                                        href="{{ url_for('.admin_view', view='products', page=page_num) }}">
-                                                        <span>{{ page_num }}</span></li>
+                                        {% if product_list %}
+                                            {% for page_num in product_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                                {% if page_num %}
+                                                    {% if product_list.page == page_num %}
+                                                        <li class="active"
+                                                            href="{{ url_for('.admin_view', view='products', page=page_num) }}">
+                                                            <span>{{ page_num }}</span></li>
+                                                    {% else %}
+                                                        <li>
+                                                            <a href="{{ url_for('.admin_view', view='products', page=page_num) }}">{{ page_num }}</a>
+                                                        </li>
+                                                    {% endif %}
                                                 {% else %}
                                                     <li>
-                                                        <a href="{{ url_for('.admin_view', view='products', page=page_num) }}">{{ page_num }}</a>
+                                                        <a href="{{ url_for('.admin_view', view='products', page=right_edge) }}">...</a>
                                                     </li>
-                                                {% endif %}
-                                            {% else %}
-                                                <li>
-                                                    <a href="{{ url_for('.admin_view', view='products', page=right_edge) }}">...</a>
-                                                </li>
 
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                         <li><a href="#">&gt;</a>
                                         </li>
                                     </ul>

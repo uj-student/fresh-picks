@@ -134,20 +134,22 @@ def add_product():
         return redirect(url_for('.add_product'))
     return render_template('admin/add_products.html')
 
-@admins.route('/admin/products/edit/<int:product_id>', methods=['POST', 'GET'])
-def edit_product(product_id):
+
+@admins.route('/admin/products/edit', methods=['POST', 'GET'])
+def edit_product():
     if not g.admins:
         return redirect(url_for('.admin'))
-    product = Products.query.filter_by(id=product_id).first()
+    p_id = request.args.get('product_id', 1, type=int)
+    product = Products.query.filter_by(id=p_id).first()
 
     if request.method == "POST":
         req = request.form
         product.name = req['product-name']
-        product.description  =req['product-description']
+        product.description = req['product-description']
         product.sell_price = req['sell-price']
         product.cost_price = req['cost-price']
-        product.image_location = req['display-image']
-        product.is_box = req['product-type']
+        product.is_box = False if req['product-type'] == "extra" else True
+        product.is_displayed = True if req['display'] == "yes" else False
 
         try:
             db.session.commit()
