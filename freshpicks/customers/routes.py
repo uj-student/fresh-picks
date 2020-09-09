@@ -91,6 +91,8 @@ def signup():
 @customers.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    my_order_history = get_my_orders()
+
     if request.method == "POST":
         req = request.form
         phone = req['phone-number']
@@ -129,18 +131,28 @@ def account():
             db.session.commit()
         except Exception:
             flash("Could not update details. Please try again later, or call us", "alert-warning")
-        user_profile = Customers.query.filter_by(id=current_user.id).first()
-        # login_user(user_profile)
-        # setupUserSession(user_profile)
+
         flash("Details updated successfully", "alert-info")
         return redirect(url_for('customers.account'))
-    return render_template('account.html')
+    return render_template('account.html', order_history = my_order_history)
 
+
+def get_my_orders():
+    return Orders.query.with_entities(
+            Orders.customer_order,
+            Orders.total_price,
+            Orders.delivery_address,
+            Orders.status,
+            Orders.date_ordered,
+            Orders.date_cancelled,
+            Orders.date_completed
+        ).filter_by(customer_id=current_user.id).order_by(Orders.date_ordered.desc()).all()
 
 @customers.route('/cart')
 @login_required
 def cart():
     return render_template('cart.html')
+
 
 @customers.route('/add', methods=['POST'])
 @login_required
@@ -242,7 +254,7 @@ def process_order():
         req = request.form
         if 'my_cart' in session:
             customer_order = ""
-            cost_order=""
+            cost_order = ""
             for k, v in session['my_cart'].items():
                 customer_order += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[1])} x {v[2]}\n"
                 cost_order += f"{k} @ {FreshPicksUtilities.formatToCurrency(v[0])} x {v[2]}\n"
