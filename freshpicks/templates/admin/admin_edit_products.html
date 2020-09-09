@@ -2,13 +2,13 @@
 {% block navbar %}Edit Product{% endblock %}
 {% block content %}
 
-
-        <section class="ftco-section">
-        {% block main %}
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-xl-7 ftco-animate">
-                        <form action="{{ url_for('.add_product') }}" method="post" class="billing-form"
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-7 ftco-animate">
+                    {% if product %}
+                        <form action="{{ url_for('.edit_product', product_id = product.id) }}" method="post"
+                              class="billing-form"
                               enctype="multipart/form-data">
                             {% with messages = get_flashed_messages(with_categories=true) %}
                                 {% if messages %}
@@ -23,14 +23,14 @@
                                     <div class="form-group">
                                         <label for="full-name">Display Name</label>
                                         <input type="text" class="form-control" name="product-name"
-                                               placeholder="Must be unique" required>
+                                               placeholder="{{ product.name }}" required>
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="home-address">Description</label>
                                         <input type="text" class="form-control" name="product-description"
-                                               placeholder="Items in the box">
+                                               placeholder="{{ product.description }}">
                                     </div>
                                 </div>
                                 <div class="w-100"></div>
@@ -38,15 +38,16 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="town-city">Cost Price (Buying Price)</label>
-                                        <input type="text" class="form-control" name="cost-price" placeholder="ZK00.00"
-                                               required>
+                                        <input type="text" class="form-control" name="cost-price"
+                                               placeholder="{{ "%.2f"|format(product.cost_price) }}" required>
                                     </div>
                                 </div>
                                 <div class="w-100"></div>
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="town-city">Sell Price (Price displayed to Customer)</label>
-                                        <input type="text" class="form-control" name="sell-price" placeholder="ZK00.00"
+                                        <input type="text" class="form-control" name="sell-price"
+                                               placeholder=placeholder="{{ "%.2f"|format(product.sell_price) }}"
                                                required>
                                     </div>
                                 </div>
@@ -56,9 +57,15 @@
                                         <label for="type">Product Type</label>
                                         <div class="select-wrap">
                                             <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-                                            <select name="type" class="form-control">
-                                                <option value="box">Box</option>
-                                                <option value="extra">Extra</option>
+                                            <select name="product-type" class="form-control">
+                                                <option value="box" {% if product.is_box == 'box' %}
+                                                        selected="selected"{% endif %}>
+                                                    Box
+                                                </option>
+                                                <option value="extra" {% if product.is_box == 'extra' %}
+                                                        selected="selected"{% endif %}>
+                                                    Extra
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -75,22 +82,22 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="display">Show to customers?</label><br>
-                                        <input type="radio" name="display" value="yes">Yes
-                                        <input type="radio" name="display" value="no">No
+                                        <input type="radio" name="display" value="yes"
+                                                {% if product.is_displayed == 'yes' %} checked="checked"{% endif %}>Yes
+                                        <input type="radio" name="display" value="no"
+                                                {% if product.is_displayed == 'no' %} checked="checked"{% endif %}>No
                                     </div>
                                 </div>
                             </div>
                             <div>
-                                <button type="submit" class="col-md-12 btn btn-primary py-3 px-4">Submit</button>
+                                <button type="submit" class="col-md-12 btn btn-primary py-3 px-4">Update Product
+                                </button>
                             </div>
                         </form><!-- END -->
-                    </div>
+                    {% endif %}
                 </div>
             </div>
-
-        {% endblock %}
+        </div>
     </section> <!-- .section -->
-
-
 
 {% endblock %}
