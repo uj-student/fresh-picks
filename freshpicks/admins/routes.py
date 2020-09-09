@@ -158,7 +158,7 @@ def edit_product():
             return redirect(url_for(".admin_views", view='products'))
 
         flash(f"{product.name} successfully edited.", "alert-success")
-        return redirect(url_for(".admin_views", view='products'))
+        return redirect(url_for(".admin_view", view='products'))
     return render_template('admin/admin_edit_products.html', product=product)
 
 
