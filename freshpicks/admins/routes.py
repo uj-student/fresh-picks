@@ -80,9 +80,15 @@ def mark_complete():
         current_status = request.form['_current_status']
         order_id = request.form['_order_id']
 
-        my_order = Orders.query.filter_by(id=order_id, status=current_status).first()
+        my_order = Orders.query.filter_by(id=order_id, status=current_status)\
+            .first()
+        update_time = datetime.datetime.now()
         try:
             my_order.status = new_status
+            if new_status == "complete":
+                my_order.date_completed = update_time
+            elif new_status == "cancel":
+                my_order.date_cancelled = update_time
             db.session.commit()
             flash(f"{my_order.buyer.fullname}'s order has been updated.", "alert-info")
         except Exception as error:
