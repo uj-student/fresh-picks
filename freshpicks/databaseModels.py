@@ -43,6 +43,7 @@ class Orders(db.Model):
     status = db.Column(db.String(), nullable=False, default="pending")
     date_completed = db.Column(db.TIMESTAMP(), nullable=True)
     date_cancelled = db.Column(db.TIMESTAMP(), nullable=True)
+    back_to_pending = db.Column(db.TIMESTAMP(), nullable=True)
 
     def __repr__(self):
         return f"Order('{self.id}', '{self.customer_id}', '{self.order}', '{self.total_price}', " \

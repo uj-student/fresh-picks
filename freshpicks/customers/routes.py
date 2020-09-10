@@ -91,7 +91,11 @@ def signup():
 @customers.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
-    recent_order = get_my_orders()[0] if get_my_orders() else []
+    recent_order = Orders.query.with_entities(
+        Orders.total_price,
+        Orders.status,
+        Orders.date_ordered,
+    ).filter_by(customer_id=current_user.id).order_by(Orders.date_ordered.desc()).first()
 
     if request.method == "POST":
         req = request.form
@@ -134,26 +138,28 @@ def account():
 
         flash("Details updated successfully", "alert-info")
         return redirect(url_for('customers.account'))
-    return render_template('account.html', recent_order = recent_order)
+    return render_template('account.html', recent_order=recent_order)
 
 
 @customers.route('/account/order_history')
 @login_required
 def order_history():
     my_order_history = get_my_orders()
-    return render_template('customer/view_order_history.html', order_history = my_order_history)
+    return render_template('customer/view_order_history.html', order_history=my_order_history)
 
 
 def get_my_orders():
     return Orders.query.with_entities(
-            Orders.customer_order,
-            Orders.total_price,
-            Orders.delivery_address,
-            Orders.status,
-            Orders.date_ordered,
-            Orders.date_cancelled,
-            Orders.date_completed
-        ).filter_by(customer_id=current_user.id).order_by(Orders.date_ordered.desc()).all()
+        Orders.customer_order,
+        Orders.total_price,
+        Orders.delivery_address,
+        Orders.status,
+        Orders.date_ordered,
+        Orders.date_cancelled,
+        Orders.date_completed
+    ).filter_by(customer_id=current_user.id).order_by(Orders.date_ordered.desc())\
+        .paginate(per_page=10, page=request.args.get('page', 1, type=int))
+
 
 @customers.route('/cart')
 @login_required

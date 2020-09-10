@@ -85,7 +85,9 @@ def mark_complete():
         update_time = datetime.datetime.now()
         try:
             my_order.status = new_status
-            if new_status == "complete":
+            if new_status == "pending":
+                my_order.back_to_pending = update_time
+            elif new_status == "complete":
                 my_order.date_completed = update_time
             elif new_status == "cancel":
                 my_order.date_cancelled = update_time
