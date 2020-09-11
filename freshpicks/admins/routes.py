@@ -37,7 +37,7 @@ def admin_view(view):
     if not g.admins:
         return redirect(url_for('.admin'))
     page = request.args.get('page', 1, type=int)
-    customer_id = request.args.get('customer_id', 1, type=int)
+    customer_id = request.args.get('customer_id', 0, type=int)
 
     if "orders" in view:
         orders = ""  # need this to handle the filter the orders  in the view
@@ -244,7 +244,6 @@ def setupAdminSession(adminUser):
 @admins.before_request
 def before_request():
     g.admins = None
-
     if 'admin_username' in session:
         g.admins = session['admin_username']
 
