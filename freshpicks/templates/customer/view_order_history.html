@@ -35,47 +35,61 @@
                                     <th>Delivered To</th>
                                     <th>Amount Paid(ZK)</th>
                                     <th>Order Status</th>
-                                    <th>Delivered On</th>
+                                    <th>Completion Date</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for order in order_history.items %}
-                                    <tr class="text-center">
-                                        <td class="categories">
-                                            <h6>{{ order.date_ordered.strftime('%Y-%m-%d %H:%M') }}</h6>
-                                        </td>
+                                    <form action="" method="post">
+                                        <tr class="text-center">
+                                            <td class="categories">
+                                                <h6>{{ order.date_ordered.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                            </td>
 
-                                        <td class="product-name">
-                                            {% set _order = order.customer_order.splitlines() %}
-                                            {% for i in _order %}
-                                                <h6>{{ i }}</h6>
-                                            {% endfor %}
-                                        </td>
+                                            <td class="product-name">
+                                                {% set _order = order.customer_order.splitlines() %}
+                                                {% for i in _order %}
+                                                    <h6>{{ i }}</h6>
+                                                {% endfor %}
+                                                <input type="hidden" name="order_name" value="{{ order.customer_order}}"/>
 
-                                        <td class="product-name">
-                                            <h6>{{ order.delivery_address }}</h6>
-                                        </td>
+                                            </td>
 
-                                        <td class="categories">
-                                            <h6>ZK{{ "%.2f"|format(order.total_price) }}</h6>
-                                        </td>
+                                            <td class="product-name">
+                                                {% set address = order.delivery_address %}
+                                                <h6>{{ address }}</h6>
+                                                <input type="hidden" name="order_address" value="{{ address }}"/>
+                                            </td>
 
-                                        <td class="categories">
-                                            <h6>{{ order.status }}</h6>
-                                        </td>
+                                            <td class="categories">
+                                                {% set price = order.total_price %}
+                                                <h6>ZK{{ "%.2f"|format(price) }}</h6>
+                                                <input type="hidden" name="order_price" value="{{ price }}"/>
+                                            </td>
 
-                                        <td class="categories">
-                                            {% if order.status == "complete" %}
-                                                <h6>Delivered on</h6>
-                                                <h6>{{ order.date_completed.strftime('%Y-%m-%d %H:%M') }}</h6>
-                                            {% elif order.status == "cancel" %}
-                                                <h6>Delivered on</h6>
-                                                <h6>{{ order.date_cancelled.strftime('%Y-%m-%d %H:%M') }}</h6>
-                                            {% else %}
-                                                <h6>N/A</h6>
-                                            {% endif %}
-                                        </td>
-                                    </tr><!-- END TR-->
+                                            <td class="categories">
+                                                <h6>{{ order.status }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                {% if order.status == "complete" %}
+                                                    <h6>Delivered on</h6>
+                                                    <h6>{{ order.date_completed.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                                {% elif order.status == "cancel" %}
+                                                    <h6>Delivered on</h6>
+                                                    <h6>{{ order.date_cancelled.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                                {% else %}
+                                                    <h6>N/A</h6>
+                                                {% endif %}
+
+                                                <div>
+                                                    <input type="submit" class="btn btn-primary" value="Order Again">
+                                                </div>
+                                            </td>
+
+                                        </tr><!-- END TR-->
+
+                                    </form>
                                 {% endfor %}
                                 </tbody><!-- END TBODY-->
                             </table>

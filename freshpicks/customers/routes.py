@@ -176,7 +176,6 @@ def add_product_to_cart():
         req = request.form
         name = req['p-name']
         cost_price = Products.query.filter_by(name=name).first().cost_price
-        print(f"cost_price: {cost_price}")
         sell_price = req['sell_price']
         image = req['p-image']
         session.modified = True
@@ -319,3 +318,8 @@ def customer_password_reset():
         return redirect(url_for(".login"))
 
     return render_template('password_reset.html')
+
+@customers.route('/re_order', methods=['POST'])
+@login_required
+def re_order():
+    pass
