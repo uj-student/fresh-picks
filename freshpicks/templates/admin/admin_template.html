@@ -69,14 +69,19 @@
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">Orders</a>
                     <div class="dropdown-menu" aria-labelledby="dropdown04">
-                        <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="all_orders") }}">
-                            All Orders
-                        </a>
                         <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="pending_orders") }}">
                             Pending Orders
                         </a>
                         <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="completed_orders") }}">
                             Complete Orders
+                        </a>
+
+                         <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="all_orders") }}">
+                            All Orders
+                        </a>
+
+                         <a class="dropdown-item" href="{{ url_for('admins.admin_view', view="cancelled_orders") }}">
+                            Cancelled Orders
                         </a>
                     </div>
                 </li>

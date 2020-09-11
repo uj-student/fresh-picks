@@ -1,0 +1,136 @@
+{% extends 'base_template.html' %}
+{% block title %} FreshPicks - Account {% endblock %}
+{% block navbar %} Account {% endblock %}
+{% block content %}
+
+    <div class="hero-wrap hero-bread" style="background-image: url('../static/images/bg_1.jpg');">
+        <div class="container">
+            <div class="row no-gutters slider-text align-items-center justify-content-center">
+                <div class="col-md-9 ftco-animate text-center">
+                    <h1 class="mb-0 bread">Previous Orders</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="ftco-section ftco-cart">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ftco-animate">
+                    <div class="cart-list">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <p class="{{ category }}">{{ message }}</p>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        {% if order_history %}
+                            <table class="table">
+                                <thead class="thead-primary">
+                                <tr class="text-center">
+                                    <th>Date</th>
+                                    <th>Order</th>
+                                    <th>Delivered To</th>
+                                    <th>Amount Paid(ZK)</th>
+                                    <th>Order Status</th>
+                                    <th>Completion Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for order in order_history.items %}
+                                    <form action="" method="post">
+                                        <tr class="text-center">
+                                            <td class="categories">
+                                                <h6>{{ order.date_ordered.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                            </td>
+
+                                            <td class="product-name">
+                                                {% set _order = order.customer_order.splitlines() %}
+                                                {% for i in _order %}
+                                                    <h6>{{ i }}</h6>
+                                                {% endfor %}
+                                                <input type="hidden" name="order_name" value="{{ order.customer_order}}"/>
+
+                                            </td>
+
+                                            <td class="product-name">
+                                                {% set address = order.delivery_address %}
+                                                <h6>{{ address }}</h6>
+                                                <input type="hidden" name="order_address" value="{{ address }}"/>
+                                            </td>
+
+                                            <td class="categories">
+                                                {% set price = order.total_price %}
+                                                <h6>ZK{{ "%.2f"|format(price) }}</h6>
+                                                <input type="hidden" name="order_price" value="{{ price }}"/>
+                                            </td>
+
+                                            <td class="categories">
+                                                <h6>{{ order.status }}</h6>
+                                            </td>
+
+                                            <td class="categories">
+                                                {% if order.status == "complete" %}
+                                                    <h6>Delivered on</h6>
+                                                    <h6>{{ order.date_completed.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                                {% elif order.status == "cancel" %}
+                                                    <h6>Delivered on</h6>
+                                                    <h6>{{ order.date_cancelled.strftime('%Y-%m-%d %H:%M') }}</h6>
+                                                {% else %}
+                                                    <h6>N/A</h6>
+                                                {% endif %}
+
+                                                <div>
+                                                    <input type="submit" class="btn btn-primary" value="Order Again">
+                                                </div>
+                                            </td>
+
+                                        </tr><!-- END TR-->
+
+                                    </form>
+                                {% endfor %}
+                                </tbody><!-- END TBODY-->
+                            </table>
+                        {% endif %}
+
+                        <div class="row mt-5">
+                            <div class="col text-center">
+                                <div class="block-27">
+                                    <ul>
+                                        {% if order_history %}
+                                            <li><a href="#">&lt;</a></li>
+                                            {% for page_num in order_history.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                                {% if page_num %}
+                                                    {% if order_history.page == page_num %}
+                                                        <li class="active"
+                                                            href="{{ url_for('customers.order_history', page=page_num) }}">
+                                                            <span>{{ page_num }}</span></li>
+                                                    {% else %}
+                                                        <li>
+                                                            <a href="{{ url_for('customers.order_history', page=page_num) }}">{{ page_num }}</a>
+                                                        </li>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <li>
+                                                        <a href="{{ url_for('customers.order_history',  page=right_edge) }}">...</a>
+                                                    </li>
+
+                                                {% endif %}
+                                            {% endfor %}
+                                            <li><a href="#">&gt;</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+{% endblock %}

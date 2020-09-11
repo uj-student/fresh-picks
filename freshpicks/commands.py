@@ -8,10 +8,9 @@ def create_tables():
     from freshpicks import db
     db.create_all()
 
-# @click.command(name='reset_tables')
-# @with_appcontext
-# def reset_db():
-#     from freshpicks import db
-#     db.session.remove()
-#     db.drop_all()
-#     db.create_all()
+@click.command(name='reset_tables')
+@with_appcontext
+def reset_db():
+    from freshpicks import db
+    db.session.remove()
+    db.drop_all()

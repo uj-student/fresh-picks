@@ -43,11 +43,12 @@ class Orders(db.Model):
     status = db.Column(db.String(), nullable=False, default="pending")
     date_completed = db.Column(db.TIMESTAMP(), nullable=True)
     date_cancelled = db.Column(db.TIMESTAMP(), nullable=True)
+    back_to_pending = db.Column(db.TIMESTAMP(), nullable=True)
 
     def __repr__(self):
-        return f"Order('{self.id}', '{self.customer_id}', '{self.order}', '{self.total_price}', " \
+        return f"Order('{self.id}', '{self.customer_id}', {self.cost_order}','{self.customer_order}', '{self.total_price}', " \
                f"'{self.delivery_address}', '{self.date_ordered}', '{self.additional_instructions}', '{self.status}', " \
-               f"'{self.date_completed}', '{self.date_cancelled}')"
+               f"'{self.date_completed}', '{self.date_cancelled}', {self.back_to_pending}')"
 
 
 class Products(db.Model):
