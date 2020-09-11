@@ -19,8 +19,9 @@
                                 </form>
                             </div>
                             <div>
-                                <a type="submit" class="btn btn-primary" href="{{ url_for('.add_admin_user') }}">Add
-                                    Admin +</a>
+                                <a type="submit" class="btn btn-primary" href="{{ url_for('.add_admin_user') }}">
+                                    Add Admin +
+                                </a>
                             </div>
                         </div>
 
@@ -33,7 +34,7 @@
                                 <th>Email</th>
                                 <th>Phone Number</th>
                                 <th>Created</th>
-                                <th></th>
+                                <th>Reset Password</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -65,20 +66,12 @@
                                                 <h6>{{ admin.date_created.strftime("%Y-%m-%d %H:%M:%S") }}</h6>
                                             </td>
 
-                                            {#                                            <td class="product-name">#}
-                                            {#                                                <select class="dropdown-toggle" name="_order_status"#}
-                                            {#                                                        data-toggle="dropdown" aria-haspopup="true"#}
-                                            {#                                                        onchange="this.form.submit()">#}
-                                            {#                                                    <option selected disabled hidden#}
-                                            {#                                                            value="current">{{ order.get_status() }}</option>#}
-                                            {#                                                    <option value="pending">Pending</option>#}
-                                            {#                                                    <option value="cancel">Cancel</option>#}
-                                            {#                                                    <option value="complete">Complete</option>#}
-                                            {#                                                </select>#}
-                                            {#                                                <input type="text" name="_current_status"#}
-                                            {#                                                       value="{{ order.get_status() }}"#}
-                                            {#                                                       hidden>#}
-                                            {#                                            </td>#}
+                                            <td class="product-name">
+                                                <a href="{{ url_for('.delete_password_reset', admin_id=admin.id) }}"
+                                                   class="alert-link">
+                                                    <span class="ion-ios-refresh"></span>
+                                                </a>
+                                            </td>
                                         </form>
                                     </tr><!-- END TR-->
                                 {% endfor %}
