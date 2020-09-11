@@ -67,10 +67,10 @@
                                         <td class="categories">
                                             {% if order.status == "complete" %}
                                                 <h6>Delivered on</h6>
-                                                <h6>{{ "%.2f"|format(order.date_completed) }}</h6>
+                                                <h6>{{ order.date_completed.strftime('%Y-%m-%d %H:%M') }}</h6>
                                             {% elif order.status == "cancel" %}
                                                 <h6>Delivered on</h6>
-                                                <h6>{{ "%.2f"|format(order.date_cancelled) }}</h6>
+                                                <h6>{{ order.date_cancelled.strftime('%Y-%m-%d %H:%M') }}</h6>
                                             {% else %}
                                                 <h6>N/A</h6>
                                             {% endif %}
@@ -89,7 +89,7 @@
                                             <li><a href="#">&lt;</a></li>
                                             {% for page_num in order_history.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
                                                 {% if page_num %}
-                                                    {% if orders_list.page == page_num %}
+                                                    {% if order_history.page == page_num %}
                                                         <li class="active"
                                                             href="{{ url_for('customers.order_history', page=page_num) }}">
                                                             <span>{{ page_num }}</span></li>

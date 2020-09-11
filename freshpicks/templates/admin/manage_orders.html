@@ -15,33 +15,20 @@
                             {% endif %}
                         {% endwith %}
 
-                        {#                        <div>#}
-                        {#                            <form action="{{ url_for('admin_view', view='orders') }}">#}
-                        {#                                <select class="dropdown-toggle" name="orders"#}
-                        {#                                        data-toggle="dropdown" aria-haspopup="true"#}
-                        {#                                        onchange="this.form.submit()">#}
-                        {#                                    <option selected disabled value="current">Pending Orders</option>#}
-                        {#                                    <option value="all_orders">All Orders</option>#}
-                        {#                                    <option value="pending_orders">Pending Orders</option>#}
-                        {#                                    <option value="complete_orders">Complete Orders</option>#}
-                        {#                                    <option value="cancelled">Cancelled Orders</option>#}
-                        {#                                </select>#}
-                        {#                            </form>#}
-                        {#                        </div>#}
-                        <table class="table">
-                            <thead class="thead-primary">
-                            <tr class="text-center">
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Order Details</th>
-                                <th>Delivery Address</th>
-                                <th>Order Placed on</th>
-                                <th>Amount Paid(ZK)</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% if orders_list %}
+                        {% if orders_list %}
+                            <table class="table">
+                                <thead class="thead-primary">
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Order Details</th>
+                                    <th>Delivery Address</th>
+                                    <th>Order Placed on</th>
+                                    <th>Amount Paid(ZK)</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
                                 {% for order in orders_list.items %}
                                     <tr class="text-center">
                                         <form action="{{ url_for('admins.mark_complete') }}" method="post">
@@ -53,7 +40,9 @@
                                             </td>
 
                                             <td class="product-name">
-                                                <h6>{{ order.buyer.fullname }}</h6>
+                                                <a href="{{ url_for('.admin_view', view='customers_orders', customer_id=order.customer_id) }}">
+                                                    <h6>{{ order.buyer.fullname }}</h6>
+                                                </a>
                                             </td>
 
                                             <td class="product-name">
@@ -94,38 +83,40 @@
                                         </form>
                                     </tr><!-- END TR-->
                                 {% endfor %}
-                            {% endif %}
-                            </tbody><!-- END TBODY-->
-                        </table>
-                        <div class="row mt-5">
-                            <div class="col text-center">
-                                <div class="block-27">
-                                    <ul>
-                                        <li><a href="#">&lt;</a></li>
-                                        {% for page_num in orders_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-                                            {% if page_num %}
-                                                {% if orders_list.page == page_num %}
-                                                    <li class="active"
-                                                        href="{{ url_for('.admin_view', view=order_type, page=page_num) }}">
-                                                        <span>{{ page_num }}</span></li>
+                                </tbody><!-- END TBODY-->
+                            </table>
+                            <div class="row mt-5">
+                                <div class="col text-center">
+                                    <div class="block-27">
+                                        <ul>
+                                            <li><a href="#">&lt;</a></li>
+                                            {% for page_num in orders_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                                {% if page_num %}
+                                                    {% if orders_list.page == page_num %}
+                                                        <li class="active"
+                                                            href="{{ url_for('.admin_view', view=order_type, page=page_num) }}">
+                                                            <span>{{ page_num }}</span></li>
+                                                    {% else %}
+                                                        <li>
+                                                            <a href="{{ url_for('admin_view', view=order_type, page=page_num) }}">{{ page_num }}</a>
+                                                        </li>
+                                                    {% endif %}
                                                 {% else %}
                                                     <li>
-                                                        <a href="{{ url_for('admin_view', view=order_type, page=page_num) }}">{{ page_num }}</a>
+                                                        <a href="{{ url_for('admin_view', view=order_type,  page=right_edge) }}">...</a>
                                                     </li>
                                                 {% endif %}
-                                            {% else %}
-                                                <li>
-                                                    <a href="{{ url_for('admin_view', view=order_type,  page=right_edge) }}">...</a>
-                                                </li>
-
-                                            {% endif %}
-                                        {% endfor %}
-                                        <li><a href="#">&gt;</a>
-                                        </li>
-                                    </ul>
+                                            {% endfor %}
+                                            <li><a href="#">&gt;</a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <h1>Empty</h1>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

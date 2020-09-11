@@ -37,6 +37,7 @@ def admin_view(view):
     if not g.admins:
         return redirect(url_for('.admin'))
     page = request.args.get('page', 1, type=int)
+    customer_id = request.args.get('customer_id', 1, type=int)
 
     if "orders" in view:
         orders = ""  # need this to handle the filter the orders  in the view
@@ -44,7 +45,7 @@ def admin_view(view):
         if view == "pending_orders":
             orders = Orders.query.filter_by(status="pending").paginate(per_page=PER_PAGE_VIEW, page=page)
             order_type = "pending_orders"
-        if view == "completed_orders":
+        elif view == "completed_orders":
             orders = Orders.query.filter_by(status="complete").paginate(per_page=PER_PAGE_VIEW, page=page)
             order_type = "completed_orders"
         elif view == "cancelled_orders":
@@ -52,7 +53,11 @@ def admin_view(view):
             order_type = "cancelled_orders"
         elif view == "all_orders":
             orders = Orders.query.paginate(per_page=PER_PAGE_VIEW, page=page)
-        return render_template('admin/manage_orders.html', order_type=order_type, orders_list=orders)
+        elif view == "customers_orders":
+            orders = Orders.query.filter_by(customer_id=customer_id).order_by(Orders.date_ordered.desc())\
+                .paginate(per_page=PER_PAGE_VIEW, page=page)
+            order_type = "customers_orders"
+        return render_template('admin/manage_orders.html', order_type=order_type, orders_list=orders, customer_id=customer_id)
     elif view == "customers":
         customer_list = Customers.query.order_by(Customers.fullname.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_customers.html', customer_list=customer_list)
@@ -71,6 +76,11 @@ def admin_view(view):
     return render_template('admin/manage_products.html', product_list=[])
 
 
+def get_customer_orders(customer_id):
+    return Orders.query.filter_by(customer_id=customer_id).order_by(Orders.date_ordered.desc()) \
+        .paginate(per_page=PER_PAGE_VIEW, page=request.args.get('page', 1, type=int))
+
+
 @admins.route('/admin/mark_complete', methods=['POST'])
 def mark_complete():
     if not g.admins:
@@ -80,7 +90,7 @@ def mark_complete():
         current_status = request.form['_current_status']
         order_id = request.form['_order_id']
 
-        my_order = Orders.query.filter_by(id=order_id, status=current_status)\
+        my_order = Orders.query.filter_by(id=order_id, status=current_status) \
             .first()
         update_time = datetime.datetime.now()
         try:
