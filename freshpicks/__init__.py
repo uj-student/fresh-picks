@@ -2,7 +2,8 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-from freshpicks.commands import create_tables
+from freshpicks.commands import create_tables, reset_db
+
 db = SQLAlchemy()
 
 login_manager = LoginManager()
@@ -29,5 +30,6 @@ def create_app(config_file='settings.py'):
     app.register_blueprint(customers)
     app.register_blueprint(admins)
     app.cli.add_command(create_tables)
+    app.cli.add_command(reset_db)
 
     return app
