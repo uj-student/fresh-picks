@@ -25,22 +25,22 @@
                                 </select>
                             </form>
                         </div>
-                        <table class="table">
-                            <thead class="thead-primary">
-                            <tr class="text-center">
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Address</th>
-                                <th>Phone Number</th>
-                                <th>Gender</th>
-                                <th>Birthday</th>
-                                <th>Email</th>
-                                <th>Sign-Up Date</th>
-                                <th>Reset Password</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% if customer_list %}
+                        {% if customer_list.items %}
+                            <table class="table">
+                                <thead class="thead-primary">
+                                <tr class="text-center">
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Address</th>
+                                    <th>Phone Number</th>
+                                    <th>Gender</th>
+                                    <th>Birthday</th>
+                                    <th>Email</th>
+                                    <th>Sign-Up Date</th>
+                                    <th>Reset Password</th>
+                                </tr>
+                                </thead>
+                                <tbody>
                                 {% for customer in customer_list.items %}
                                     <tr class="text-center">
                                         <td class="total">
@@ -83,9 +83,18 @@
                                         </td>
                                     </tr><!-- END TR-->
                                 {% endfor %}
-                            {% endif %}
-                            </tbody><!-- END TBODY-->
-                        </table>
+                                </tbody><!-- END TBODY-->
+                            </table>
+                        {% else %}
+                            <div class="col-lg-12 mt-5 cart-wrap ftco-animate">
+                                <div class="cart-total mb-3">
+                                    <h2 class="ion-md-person"> No registered Customers</h2>
+                                    <p><a href="{{ url_for('.admin_view', view="admin_users") }}"
+                                          class="btn btn-primary py-3 px-4">View Admin Users</a></p>
+                                </div>
+                            </div>
+                        {% endif %}
+
                         <div class="row mt-5">
                             <div class="col text-center">
                                 <div class="block-27">

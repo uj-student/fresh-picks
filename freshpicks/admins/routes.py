@@ -21,11 +21,14 @@ def admin():
         user_profile = AdminUsers.query.filter_by(username=req['user-name']).first()
         if user_profile is None:
             flash("Account could not be found. Please contact Admin.", "alert-danger")
-            return render_template('admin/admin_login.html')
+            return redirect(url_for('.admin'))
+        elif not user_profile.password:
+            flash("Please reset your password.", "alert-danger")
+            return redirect(url_for('.admin'))
         else:
             if not check_password_hash(user_profile.password, req['enter-password']):
                 flash("Incorrect Password", "alert-danger")
-                return render_template('admin/admin_login.html')
+                return redirect(url_for('.admin'))
 
         setupAdminSession(user_profile)
         return redirect(url_for('.admin_view', view='all_orders'))
