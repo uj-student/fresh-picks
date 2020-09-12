@@ -69,7 +69,7 @@ class Products(db.Model):
 class AdminUsers(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, unique=True)
     username = db.Column(db.String(), nullable=False, unique=True)
-    password = db.Column(db.String(), nullable=False)
+    password = db.Column(db.String(), nullable=True)
     cellphone_number = db.Column(db.String(), nullable=False, unique=True)
     name = db.Column(db.String(), nullable=False, unique=True)
     email_address = db.Column(db.String(), unique=True, nullable=False)

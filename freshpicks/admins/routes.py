@@ -21,11 +21,14 @@ def admin():
         user_profile = AdminUsers.query.filter_by(username=req['user-name']).first()
         if user_profile is None:
             flash("Account could not be found. Please contact Admin.", "alert-danger")
-            return render_template('admin/admin_login.html')
+            return redirect(url_for('.admin'))
+        elif not user_profile.password:
+            flash("Please reset your password.", "alert-danger")
+            return redirect(url_for('.admin'))
         else:
             if not check_password_hash(user_profile.password, req['enter-password']):
                 flash("Incorrect Password", "alert-danger")
-                return render_template('admin/admin_login.html')
+                return redirect(url_for('.admin'))
 
         setupAdminSession(user_profile)
         return redirect(url_for('.admin_view', view='all_orders'))
@@ -54,10 +57,11 @@ def admin_view(view):
         elif view == "all_orders":
             orders = Orders.query.paginate(per_page=PER_PAGE_VIEW, page=page)
         elif view == "customers_orders":
-            orders = Orders.query.filter_by(customer_id=customer_id).order_by(Orders.date_ordered.desc())\
+            orders = Orders.query.filter_by(customer_id=customer_id).order_by(Orders.date_ordered.desc()) \
                 .paginate(per_page=PER_PAGE_VIEW, page=page)
             order_type = "customers_orders"
-        return render_template('admin/manage_orders.html', order_type=order_type, orders_list=orders, customer_id=customer_id)
+        return render_template('admin/manage_orders.html', order_type=order_type, orders_list=orders,
+                               customer_id=customer_id)
     elif view == "customers":
         customer_list = Customers.query.order_by(Customers.fullname.asc()).paginate(per_page=PER_PAGE_VIEW, page=page)
         return render_template('admin/manage_customers.html', customer_list=customer_list)
@@ -182,31 +186,21 @@ def edit_product():
 
 @admins.route('/admin/users/add', methods=['POST', 'GET'])
 def add_admin_user():
-    if not g.admins:
-        return redirect(url_for('.admin'))
+    # if not g.admins:
+    #     return redirect(url_for('.admin'))
     if request.method == "POST":
         req = request.form
 
         if len(req['username']) < 6:
             flash("Username must be at least 6 characters long. Please try again.", "alert-warning")
-            # return redirect(url_for("add_admin_user"))
-            return render_template('admin/admin_register.html')
-
-        if len(req['password']) < 10:
-            flash("Password must be at least 10 characters. Please choose a strong password.", "alert-danger")
-            # return render_template('admin/admin_register.html')
             return redirect(url_for(".add_admin_user"))
-
-        if req['password'] != req['confirm-password']:
-            flash("Ensure that passwords are the same. Please try again.", "alert-danger")
-            return render_template('admin/admin_register.html')
 
         if len(req['phone-number']) < 7:
             flash("Phone number may be short a few digits", "alert-warning")
+            return redirect(url_for(".add_admin_user"))
 
         admin_account = AdminUsers(
             username=req['username'],
-            password=generate_password_hash(req['password']),
             cellphone_number=str(req['phone-number']).replace(" ", ""),
             name=req['fullname'],
             email_address=req['email-address']
@@ -225,7 +219,7 @@ def add_admin_user():
     return render_template('admin/admin_register.html')
 
 
-@admins.route('/admin/reset/<int:customer_id>')
+@admins.route('/admin/customer/reset_password/<int:customer_id>')
 def password_reset(customer_id):
     customer = Customers.query.filter_by(id=customer_id).first()
     customer.password = None
@@ -234,6 +228,15 @@ def password_reset(customer_id):
           "alert-info")
     return redirect(url_for('.admin_view', view='customers'))
 
+
+@admins.route('/admin/admin/reset_password/<int:admin_id>')
+def delete_password_reset(admin_id):
+    admin_account = AdminUsers.query.filter_by(id=admin_id).first()
+    admin_account.password = None
+    db.session.commit()
+    flash(f"{admin_account.username}'s password has been reset. \nPlease inform them to set a new password.",
+          "alert-info")
+    return redirect(url_for('.admin_view', view='admin_users'))
 
 def setupAdminSession(adminUser):
     session.clear()
@@ -258,3 +261,34 @@ def update_message(comment_id):
         flash(f"Message from {comment.name} has been closed.", "alert-info")
         return redirect(url_for('.admin_view', view='customer_messages'))
     return render_template('manage_comments.html')
+
+
+@admins.route('/admin/reset_password', methods=['POST', 'GET'])
+def admin_password_reset():
+    if request.method == 'POST':
+        req = request.form
+        entered_username = req['username']
+        new_password = req['new-password']
+        confirm_password = req['confirm-password']
+
+        user_profile = AdminUsers.query.filter_by(username=entered_username).first()
+
+        if user_profile and not user_profile.password:
+            if len(new_password) > 9 and new_password == confirm_password:
+                user_profile.password = generate_password_hash(new_password)
+                try:
+                    db.session.commit()
+                except Exception as error:
+                    pass
+            else:
+                flash("Passwords must be at least 10 characters and match. Please choose a strong password.",
+                      "alert-danger")
+                return redirect(url_for(".admin_password_reset"))
+        else:
+            flash("Cannot reset password at the moment. Please contact admin for help.", "alert-danger")
+            return redirect(url_for(".admin_password_reset"))
+
+        flash("Your password has been successfully reset. Use new password to log in", "alert-info")
+        return redirect(url_for(".admin"))
+
+    return render_template('admin/admin_reset_password.html')

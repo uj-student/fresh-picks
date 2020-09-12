@@ -297,7 +297,6 @@ def customer_password_reset():
         confirm_password = req['confirm-password']
 
         user_profile = Customers.query.filter_by(phone_number=entered_number).first()
-        password = ""
 
         if user_profile and not user_profile.password:
             if len(new_password) > 9 and new_password == confirm_password:
