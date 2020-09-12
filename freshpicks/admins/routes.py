@@ -186,8 +186,8 @@ def edit_product():
 
 @admins.route('/admin/users/add', methods=['POST', 'GET'])
 def add_admin_user():
-    # if not g.admins:
-    #     return redirect(url_for('.admin'))
+    if not g.admins:
+        return redirect(url_for('.admin'))
     if request.method == "POST":
         req = request.form
 
