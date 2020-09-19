@@ -4,17 +4,16 @@
 {% block content %}
 
     <section id="home-section" class="hero">
-        <div class="home-slider owl-carousel">
+        <div class="home-slider owl-carousel" aria-disabled="true">
             <div class="slider-item" style="background-image: url(../static/images/bg_1.jpg);">
                 <div class="overlay"></div>
                 <div class="container">
                     <div class="row slider-text justify-content-center align-items-center" data-scrollax-parent="true">
-
                         <div class="col-md-12 ftco-animate text-center">
                             <h1 class="mb-2">We serve Fresh Vegetables &amp; Fruits</h1>
                             <h2 class="subheading mb-4">We deliver organic vegetables &amp; fruits</h2>
                             {% if not current_user.is_authenticated %}
-                                <p><a href="/sign-up" class="col-md-3 btn btn-primary">Sign Up</a></p>
+                                <p><a href="{{ url_for('customers.signup') }}" class="col-md-3 btn btn-primary">Sign Up</a></p>
                             {% endif %}
                         </div>
                     </div>
@@ -30,7 +29,7 @@
                             <h1 class="mb-2">100% Fresh &amp; Organic Foods</h1>
                             <h2 class="subheading mb-4">We deliver organic vegetables &amp; fruits</h2>
                             {% if not current_user.is_authenticated %}
-                                <p><a href="/sign-up" class="col-md-3 btn btn-primary">Sign Up</a></p>
+                                <p><a href="{{ url_for('customers.signup') }}" class="col-md-3 btn btn-primary">Sign Up</a></p>
                             {% endif %}
                         </div>
                     </div>
