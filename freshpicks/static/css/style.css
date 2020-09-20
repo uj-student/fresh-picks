@@ -11665,8 +11665,8 @@ h1, h2, h3, h4, h5,
 }
 
 .owl-carousel {
-    -ms-touch-action: auto;
-    touch-action: auto;
+    -ms-touch-action: pan-x;
+    touch-action: pan-x;
     position: relative;
 }
 
