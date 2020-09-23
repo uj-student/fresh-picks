@@ -63,7 +63,9 @@
    $.Scrollax();
 
 	var carousel = function() {
-		$('.home-slider').owlCarousel({
+		$(window).on('load', function () {
+
+			$('.home-slider').owlCarousel({
 	    loop:true,
 	    autoplay: true,
 	    margin:0,
@@ -85,8 +87,8 @@
 	      }
 	    }
 		});
-	
-		$('.carousel-testimony').owlCarousel({
+
+			$('.carousel-testimony').owlCarousel({
 			center: true,
 			loop: true,
 			items:1,
@@ -107,7 +109,7 @@
 			}
 		});
 
-		$('.owl-carousel').owlCarousel({
+			$('.owl-carousel').owlCarousel({
     loop:true,
     margin:10,
     nav:true,
@@ -123,7 +125,7 @@
         }
     }
 });
-
+		})
 	};
 	carousel();
 
